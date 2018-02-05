@@ -34,4 +34,5 @@ Watch this space!
 | Numba&mdash;http://numba.pydata.org/ |
 | Pillow&mdash;http://pillow.readthedocs.io/en/3.1.x/installation.html |
 | h5py&mdash;http://h5py.org |
-Most of these things are in the default anaconda package.
+
+These things are in the default anaconda package. If the installation becomes more complicated I will detail it here.

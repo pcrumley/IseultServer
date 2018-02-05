@@ -12,7 +12,8 @@ to a folder in a location where you have read access to simulation data.
 
 cd to the directory and type
 ```bash
-$ python server.py
+$ export FLASK_APP=server.py
+
 ```
 
 The python code that provides the RESTful api is located in the ./src/ directory. 

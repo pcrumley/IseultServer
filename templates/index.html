@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <title>IseultJS</title>
+  <meta charset="utf-8" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>{{ imageSrc }}</p>
+    <img :src="imageSrc">
+  </div>
+<script>
+new Vue({
+  //options here:
+  el: "#app",
+  data: {
+    imageSrc : "http://127.0.0.1:8000/api/imgs/?n=1"
+  }
+})
+</script>
+</body>
+</html>

@@ -70,20 +70,11 @@ class myNumbaImage(object):
         # and corresponds to the data from xlim and ylim.
         cmin = self.data[~np.isnan(self.data)].min() if self.clim[0] is None else self.clim[0]
         cmax = self.data[~np.isnan(self.data)].max() if self.clim[1] is None else self.clim[1]
+        xmin = self.extent[0] if self.xlim[0] is None else self.xlim[0]
+        xmax = self.extent[1] if self.xlim[1] is None else self.xlim[1]
+        ymin = self.extent[2] if self.ylim[0] is None else self.ymin[1]
+        ymax = self.extent[3] if self.ylim[1] is None else self.ylim[1]
 
-        xmin = self.xlim[0]
-        if xmin is None:
-            xmin = self.extent[0]
-        xmax = self.xlim[1]
-        if xmax is None:
-            xmax = self.extent[1]
-
-        ymin = self.ylim[0]
-        if ymin is None:
-            ymin = self.extent[2]
-        ymax = self.ylim[1]
-        if ymax is None:
-            ymax = self.extent[3]
         # Since we are using nearest neighbor algorithm to resize images we
         # either re-grid the data to the image size then make the image, or
         # we can resize data first then compute the norm, or we can compute
@@ -119,11 +110,6 @@ def makeTransparent(img):
 
 @jit(nopython=True, cache =True)
 def reGridData(data, target, extent, xmin, xmax, ymin, ymax):
-    '''Remake the data the same size as the image array. I think you could
-    probably do this in the same step that the norms are applied
-    xmin, xmax, ymin, and ymax correspond to the size of the target data.
-    extent is the size of the actual data [ x0, x1, y0, y1]'''
-    # multipliers that convert and image index to a data index
     '''Remake the data the same size as the image array. I think you could
     probably do this in the same step that the norms are applied
     xmin, xmax, ymin, and ymax correspond to the size of the target data.

@@ -62,10 +62,8 @@ def eval_clause(clause, sim, prtl_type):
         left_dat = []
         if tmplist[0] in getattr(sim,prtl_type).quantities:
             left_dat = getattr(getattr(sim,prtl_type),tmplist[0])
-        if len(tmplist) ==4:
-            right_num = float(tmplist[2]+'.'+tmplist[3])
-        else:
-            right_num = float(tmplist[2])
+
+        right_num = float(tmplist[2]+'.'+tmplist[3]) if len(tmplist) ==4 else float(tmplist[2])
         if tmplist[1] == 'le':
             return left_dat <= right_num
         elif tmplist[1] == 'lt':

@@ -2,7 +2,7 @@ from numba import jit,guvectorize, float64, uint, b1,uint8, float32
 from math import fabs, copysign, log10,sqrt
 from numpy import nan, isnan
 import numpy as np
-from .myCmaps import myCmaps
+from myCmaps import myCmaps
 from PIL import Image
 
 class myNumbaImage(object):
@@ -36,6 +36,7 @@ class myNumbaImage(object):
     def setNorm(self, normStr, zero = 0.0, gamma = 1.0, clipped = True):
         self.clipped = True
         if normStr == 'linear' or normStr == 'log':
+
             self.norm = normStr
         elif normStr == 'pow':
             self.norm = normStr
@@ -70,7 +71,6 @@ class myNumbaImage(object):
         cmin = self.data[~np.isnan(self.data)].min() if self.clim[0] is None else self.clim[0]
         cmax = self.data[~np.isnan(self.data)].max() if self.clim[1] is None else self.clim[1]
 
-        print(cmin, cmax)
         xmin = self.xlim[0]
         if xmin is None:
             xmin = self.extent[0]
@@ -107,7 +107,6 @@ class myNumbaImage(object):
             powNormColorBin = powerNormBin(cmin, cmax, self.zero, self.gamma,myCmaps[self.cmap].shape[0] )
             powerNormImg(self.data,cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'log':
-            print('should be log')
             logNorm(self.data,cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
         #self.img = np.flip(self.img, axis  = 0)
         #print(self.img, self.img)

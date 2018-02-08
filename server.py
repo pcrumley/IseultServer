@@ -1,6 +1,7 @@
 from flask import Flask, send_file, request, abort
-from .src.particle_hist import make_2d_hist_img
 import sys
+sys.path.insert(0, './src/')
+from particle_hist import make_2d_hist_img
 import io
 import h5py
 app = Flask(__name__)

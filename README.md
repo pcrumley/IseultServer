@@ -10,19 +10,19 @@ You must locally host the server on at each place where you have simulation data
 access. The server should be only locally hosted. To start the server, download the git directory
 to a folder in a location where you have read access to simulation data.
 
-cd to the directory and type
+To run the server on tigressdata, cd to the directory and type
 ```bash
-$ export FLASK_APP=server.py
-
+$ module load anaconda3 
+$ python server.py
 ```
 
 The python code that provides the RESTful api is located in the ./src/ directory. 
 You can easily make new APIs for different simulations using the templates as a starting point.
 
-The data can be visualized with Iseult.js&mdash;a javascript front-end for the server located here: 
+The data will eventually be visualized with Iseult.js&mdash;a javascript front-end for the server located here: 
 http://github.com/pcrumley/Iseultjs
 
-Right now, it's not very useful as it is still in heavy development.
+Right now, it's not very useful as it is still in heavy development, but you can play around by manually editing the urls to handle the calls.
 
 Watch this space!
 

@@ -2,14 +2,15 @@ from numba import jit,guvectorize, float64, uint, b1,uint8, float32
 from math import fabs, copysign, log10,sqrt
 from numpy import nan, isnan
 import numpy as np
-from myCmaps import myCmaps
-import PIL
-class myFieldImage(object):
+from .myCmaps import myCmaps
+from PIL import Image
+
+class myNumbaImage(object):
     '''A class that will handle the image writing
     '''
     def __init__(self, py, px):
-        self.py = py
-        self.px = px
+        self.py = py #in pixels
+        self.px = px #in pixels
 
         self.cmap = 'viridis'
         self.norm = 'linear'
@@ -32,8 +33,8 @@ class myFieldImage(object):
 
     def setCmap(self, cmapStr):
         self.cmap = cmapStr
-
-    def setNorm(self, normStr, zero = 0.0, gamma = 1.0):
+    def setNorm(self, normStr, zero = 0.0, gamma = 1.0, clipped = True):
+        self.clipped = True
         if normStr == 'linear' or normStr == 'log':
             self.norm = normStr
         elif normStr == 'pow':
@@ -55,19 +56,21 @@ class myFieldImage(object):
             self.ylim[0] = ymin
         if ymax != None:
             self.ylim[1] = ymax
+    def set_clim(self, cmin = None, cmax = None):
+        if cmin != None:
+            self.clim[0] = cmin
+        if cmax != None:
+            self.clim[1] = cmax
 
     def renderImage(self):
         '''Render an image from the data'''
         #try:
         # we want to render image that is px by py in size,
         # and corresponds to the data from xlim and ylim.
-        cmin = self.clim[0]
-        if cmin is None:
-            cmin = self.data.min()
-        cmax = self.clim[1]
-        if cmax is None:
-            cmax = self.data.max()
+        cmin = self.data[~np.isnan(self.data)].min() if self.clim[0] is None else self.clim[0]
+        cmax = self.data[~np.isnan(self.data)].max() if self.clim[1] is None else self.clim[1]
 
+        print(cmin, cmax)
         xmin = self.xlim[0]
         if xmin is None:
             xmin = self.extent[0]
@@ -104,11 +107,11 @@ class myFieldImage(object):
             powNormColorBin = powerNormBin(cmin, cmax, self.zero, self.gamma,myCmaps[self.cmap].shape[0] )
             powerNormImg(self.data,cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'log':
-
+            print('should be log')
             logNorm(self.data,cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
         #self.img = np.flip(self.img, axis  = 0)
         #print(self.img, self.img)
-        self.img = PIL.Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).resize((200,400), PIL.Image.BICUBIC)
+        self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).resize((self.px,self.py), Image.BICUBIC)
 
 @guvectorize([(uint8[:],)], # img as RBGA 8 bit array
              '(k)', nopython = True, cache = True, target='parallel')

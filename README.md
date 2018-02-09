@@ -7,8 +7,9 @@ Current design plans are that it will likely never be secure enough to allow arb
 to the various clusters where your data may be saved.
 
 You must locally host the server on at each place where you have simulation data you would like to 
-access. The server should be only locally hosted. To start the server, download the git directory
-to a folder in a location where you have read access to simulation data.
+access. The server should be only locally hosted with port-forwarding to access from your computer. 
+To start the server, download the git directory to a folder in a location where you have read access 
+to simulation data.
 
 To run the server on tigressdata, cd to the directory and type
 ```bash

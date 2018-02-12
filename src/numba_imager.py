@@ -83,13 +83,6 @@ class myNumbaImage(object):
             ymin = yc-dy
             ymax = yc+dy
 
-        # Since we are using nearest neighbor algorithm to resize images we
-        # either re-grid the data to the image size then make the image, or
-        # we can resize data first then compute the norm, or we can compute
-        # norm on entire dataset then resize the image. If we ever implement
-        # other interpolations like bicubic/bilinear, whatever, we should
-        # always apply the interpolation on the normed image.
-
         ### TODO --- Implement efficient algorithm where interpolation is
         # performed on the images before the norm.
 
@@ -104,9 +97,8 @@ class myNumbaImage(object):
             powerNormImg(self.data[::-1,:],cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'log':
             logNorm(self.data[::-1,:],cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
-        #self.img = np.flip(self.img, axis  = 0)
-        #print(self.img, self.img)
-        # We need to calculate the a,b,c,d,e,f params for the affine transformation
+
+        # We need to calculate the a,b,c,d,e,f matrix coefficients for the affine transformation in PIL
         a = (xmax-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1]/self.px
         b = 0
         c = -(self.extent[0]-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1] #I'm not 100% sure why this works...
@@ -121,45 +113,6 @@ class myNumbaImage(object):
              '(k)', nopython = True, cache = True, target='parallel')
 def makeTransparent(img):
     img[3]=0
-
-@jit(nopython=True, cache =True)
-def reGridData(data, target, extent, xmin, xmax, ymin, ymax):
-    '''Remake the data the same size as the image array. I think you could
-    probably do this in the same step that the norms are applied
-    xmin, xmax, ymin, and ymax correspond to the size of the target data.
-    extent is the size of the actual data [ x0, x1, y0, y1]'''
-    # multipliers that convert and image index to a data index
-    tsizex = xmax-xmin # The x size of the image
-    tsizey = ymax-ymin # The y size of the image
-    y2diy = (extent[3]-extent[2])/data.shape[0]
-    x2dix = (extent[1]-extent[0])/data.shape[1]
-    # the output data image is only defined where the original data existed.
-    # i.e. between the originally defined extent. We define the
-    imin = ((extent[2]-ymin)*target.shape[0])/tsizey
-    imax = ((extent[3]-ymin)*target.shape[0])/tsizey
-    jmin = ((extent[0]-xmin)*target.shape[1])/tsizex
-    jmax = ((extent[1]-xmin)*target.shape[1])/tsizex
-    xhelp = (xmin-extent[0])/x2dix
-    jhelp = tsizex/target.shape[1]/x2dix
-    yhelp = (ymin-extent[2])/y2diy
-    ihelp = tsizey/target.shape[0]/y2diy
-    target[:,:] =nan
-    for i in range(target.shape[0]):
-        if i<=imax and  i>=imin:
-            idat = round(yhelp-i*ihelp)
-            if idat < 0:
-                idat = 0
-            elif idat >= data.shape[0]:
-                idat = data.shape[0]-1
-            for j in range(target.shape[1]):
-                if j<=jmax and j>=jmin:
-                    jdat = round(xhelp+j*jhelp)
-                    if jdat <0:
-                        jdat = 0
-                    elif jdat >= data.shape[1]:
-                        jdat=data.shape[1]-1
-                    target[i,j] = data[idat,jdat]
-
 
 @guvectorize([(float64[:], # data
                float64[:], # vmin

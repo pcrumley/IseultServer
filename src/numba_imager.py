@@ -22,12 +22,13 @@ class myNumbaImage(object):
         self.gamma = 1.0
         self.clipped = True
         self.data = None
+        self.interpolation = 'bicubic'
         self.griddedData = np.empty((py, px))
 
     def setData(self, X):
         '''The fields data and the info needed to convert to physical units'''
         self.data = X
-        self.imgData = np.empty((self.data.shape[0],self.data.shape[1],4), dtype = 'uint8')
+
     def setExtent(self, exList):
         self.extent = exList
 
@@ -72,7 +73,7 @@ class myNumbaImage(object):
         cmax = self.data[~np.isnan(self.data)].max() if self.clim[1] is None else self.clim[1]
         xmin = self.extent[0] if self.xlim[0] is None else self.xlim[0]
         xmax = self.extent[1] if self.xlim[1] is None else self.xlim[1]
-        ymin = self.extent[2] if self.ylim[0] is None else self.ymin[1]
+        ymin = self.extent[2] if self.ylim[0] is None else self.ylim[0]
         ymax = self.extent[3] if self.ylim[1] is None else self.ylim[1]
 
         # Since we are using nearest neighbor algorithm to resize images we
@@ -83,25 +84,35 @@ class myNumbaImage(object):
         # always apply the interpolation on the normed image.
 
         ### TODO --- Implement efficient algorithm where interpolation is
-        # performed on the images instead of data.
-        """
-        if self.griddedData.shape[0] != self.img.shape[0] or self.griddedData.shape[1] != self.img.shape[1]:
-            self.griddedData = np.empty([self.img.shape[0], self.img.shape[1]], dtype = 'f8')
-        reGridData(self.data, self.griddedData, self.extent, xmin, xmax, ymin, ymax)
-        """
+        # performed on the images before the norm.
+
+        self.imgData = np.empty((self.data.shape[0],self.data.shape[1],4), dtype = 'uint8')
         if self.norm =='linear':
-            linearNorm(self.data, cmin, cmax, self.clipped, myCmaps[self.cmap], self.imgData)
+            linearNorm(self.data[::-1,:], cmin, cmax, self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'pow':
             # first we have to calculate some stuff that will be passed to
             # powerNorm for optimizations
             cminNormed = powerNormFunc(cmin, self.zero, self.gamma)
             powNormColorBin = powerNormBin(cmin, cmax, self.zero, self.gamma,myCmaps[self.cmap].shape[0] )
-            powerNormImg(self.data,cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
+            powerNormImg(self.data[::-1,:],cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'log':
-            logNorm(self.data,cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
+            logNorm(self.data[::-1,:],cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
         #self.img = np.flip(self.img, axis  = 0)
         #print(self.img, self.img)
-        self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).resize((self.px,self.py), Image.BICUBIC)
+        # We need to calculate the a,b,c,d,e,f params for the affine transformation
+        world2px = lambda x: (x-self.extent[0])/(self.extent[1]-self.extent[0])*self.px/self.imgData.shape[1]
+        world2py = lambda y: (y-self.extent[2])/(self.extent[3]-self.extent[2])*self.py/self.imgData.shape[0]
+        sx=sy=1.0
+        a = (xmax-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1]/self.px
+        b = 0
+        c = -(self.extent[0]-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1] #I'm not 100% sure why this works...
+        d = 0
+        e = (ymax-ymin)/(self.extent[3]-self.extent[2])*self.imgData.shape[0]/self.py
+        f = (self.extent[3]-ymax)/(self.extent[3]-self.extent[2])*self.imgData.shape[0] #I'm not 100% sure why this works...
+
+        self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)#resize((self.px,self.py),
+                                    #Image.BICUBIC if self.interpolation == 'bicubic' else Image.NEAREST
+                                    #).transpose(Image.FLIP_TOP_BOTTOM)
 
 @guvectorize([(uint8[:],)], # img as RBGA 8 bit array
              '(k)', nopython = True, cache = True, target='parallel')

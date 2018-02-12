@@ -158,6 +158,10 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
 
     hist_img.setData(hist)
     hist_img.setExtent([xvalmin,xvalmax,yvalmin, yvalmax])
+    hist_img.set_xlim(xmin = None if len(xmin)==0 else float(xmin),
+                      xmax = None if len(xmax)==0 else float(xmax))
+    hist_img.set_ylim(ymin = None if len(ymin)==0 else float(ymin),
+                      ymax = None if len(ymax)==0 else float(ymax))
     if cnorm =='log':
         hist_img.setNorm('log',clipped = True if clip =='true' else False)
     if cnorm =='linear':

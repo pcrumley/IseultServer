@@ -170,6 +170,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
         hist_img.setNorm('pow',zero = float(pow_zero), gamma = float(pow_gamma),clipped = True if clip =='true' else False)
     hist_img.setCmap(cmap)
     hist_img.set_clim(cmin = None if len(vmin) ==0 else float(vmin), cmax = None if len(vmax)==0 else float(vmax))
+    hist_img.set_aspect(0 if aspect=='auto' else 1)
     hist_img.renderImage()
     img_io = io.BytesIO()
     hist_img.img.save(img_io, format='png',compress_level = 1)#, quality=100)

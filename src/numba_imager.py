@@ -31,7 +31,9 @@ class myNumbaImage(object):
 
     def setExtent(self, exList):
         self.extent = exList
-
+    def set_aspect(self, arg):
+        '''we preserve xlims. and we make a middle about the ylims'''
+        self.aspect=arg
     def setCmap(self, cmapStr):
         self.cmap = cmapStr
     def setNorm(self, normStr, zero = 0.0, gamma = 1.0, clipped = True):
@@ -75,6 +77,11 @@ class myNumbaImage(object):
         xmax = self.extent[1] if self.xlim[1] is None else self.xlim[1]
         ymin = self.extent[2] if self.ylim[0] is None else self.ylim[0]
         ymax = self.extent[3] if self.ylim[1] is None else self.ylim[1]
+        if self.aspect:
+            yc = (ymax+ymin)/2
+            dy = 0.5*(xmax-xmin)*self.py/self.px
+            ymin = yc-dy
+            ymax = yc+dy
 
         # Since we are using nearest neighbor algorithm to resize images we
         # either re-grid the data to the image size then make the image, or
@@ -100,19 +107,15 @@ class myNumbaImage(object):
         #self.img = np.flip(self.img, axis  = 0)
         #print(self.img, self.img)
         # We need to calculate the a,b,c,d,e,f params for the affine transformation
-        world2px = lambda x: (x-self.extent[0])/(self.extent[1]-self.extent[0])*self.px/self.imgData.shape[1]
-        world2py = lambda y: (y-self.extent[2])/(self.extent[3]-self.extent[2])*self.py/self.imgData.shape[0]
-        sx=sy=1.0
         a = (xmax-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1]/self.px
         b = 0
         c = -(self.extent[0]-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1] #I'm not 100% sure why this works...
         d = 0
         e = (ymax-ymin)/(self.extent[3]-self.extent[2])*self.imgData.shape[0]/self.py
         f = (self.extent[3]-ymax)/(self.extent[3]-self.extent[2])*self.imgData.shape[0] #I'm not 100% sure why this works...
+        self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f),
+                                   resample=Image.BICUBIC if self.interpolation == 'bicubic' else Image.NEAREST)
 
-        self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)#resize((self.px,self.py),
-                                    #Image.BICUBIC if self.interpolation == 'bicubic' else Image.NEAREST
-                                    #).transpose(Image.FLIP_TOP_BOTTOM)
 
 @guvectorize([(uint8[:],)], # img as RBGA 8 bit array
              '(k)', nopython = True, cache = True, target='parallel')

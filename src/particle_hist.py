@@ -107,7 +107,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                     xbins ='200', yvalmin='', yvalmax='', xvalmin = '',
                     xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'log',
                     pow_zero = '0', pow_gamma='1.0', vmin = '', clip = 'true',
-                    vmax = '', xmin='', xmax ='', ymin='', ymax='',
+                    vmax = '', xmin='', xmax ='', ymin='', ymax='', interpolation = 'bicubic',
                     px ='400', py='400', aspect='auto', mask_zeros='true'):
     '''First we calculate the histogram, then we turn it into an image and return
     the image as a bytesIO'''
@@ -154,7 +154,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     if mask_zeros =='true':
         hist[hist==0] = np.nan
     hist_img = myNumbaImage(int(py), int(px))
-
+    hist_img.setInterpolation(interpolation)
     hist_img.setData(hist)
     hist_img.setExtent([xvalmin,xvalmax,yvalmin, yvalmax])
     hist_img.set_xlim(xmin = None if len(xmin)==0 else float(xmin),

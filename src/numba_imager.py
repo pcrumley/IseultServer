@@ -36,6 +36,8 @@ class myNumbaImage(object):
     def set_aspect(self, arg):
         '''we preserve xlims. and we make a middle about the ylims'''
         self.aspect=arg
+    def setInterpolation(self, arg):
+        self.interpolation = arg
     def setCmap(self, cmapStr):
         if cmapStr in myCmaps.keys():
             self.cmap = cmapStr
@@ -104,7 +106,7 @@ class myNumbaImage(object):
         # We need to calculate the a,b,c,d,e,f matrix coefficients for the affine transformation in PIL
         a = (xmax-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1]/self.px
         b = 0
-        c = -(self.extent[0]-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1] #I'm not 100% sure why this works...
+        c = -(self.extent[0]-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1] #I'm not 100% sure why this works but it do...
         d = 0
         e = (ymax-ymin)/(self.extent[3]-self.extent[2])*self.imgData.shape[0]/self.py
         f = (self.extent[3]-ymax)/(self.extent[3]-self.extent[2])*self.imgData.shape[0] #I'm not 100% sure why this works...

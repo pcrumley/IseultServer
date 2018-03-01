@@ -1,4 +1,4 @@
-from flask import Flask, send_file, request, abort
+from flask import Flask, send_file, request, abort, jsonify
 import sys
 sys.path.insert(0, './src/')
 from particle_hist import make_2d_hist_img
@@ -30,6 +30,9 @@ def field_image():
         img_io.close()
     abort(404)
 """
+@app.route('/api/handshake')
+def handshake():
+    return jsonify({name:'IseultServer', version: 'alpha'})
 @app.route('/api/2dhist/imgs/')
 def hist2d_image():
 
@@ -43,7 +46,10 @@ def hist2d_image():
         if arg:
             query_dict[key] = arg
     img_io = make_2d_hist_img(**query_dict)
-    return send_file(img_io, mimetype='image/png')
+    #return send_file(img_io, mimetype='image/png')
+    return jsonify({'img':img_io.decode('utf-8')})
+
+    #return jsonify(query_dict)
     abort(404)
 if __name__=='__main__':
     app.run(port=5000, debug=True)

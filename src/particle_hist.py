@@ -4,6 +4,7 @@ from math import sqrt, log10
 from tristan_sim import TristanSim
 from numba_imager import myNumbaImage
 import io
+import base64
 import numpy as np
 #import os
 #os.environ['NUMBA_WARNINGS'] = '1'
@@ -175,7 +176,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     img_io = io.BytesIO()
     hist_img.img.save(img_io, format='png',compress_level = 1)#, quality=100)
     img_io.seek(0)
-    return img_io
+    return base64.b64encode(img_io.getvalue())
 
 
 

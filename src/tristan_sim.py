@@ -133,9 +133,9 @@ class TristanSim(object):
     particle-in-cell simulations. The specifics of your simulation should be
     defined as a class that extends this object.'''
     params = ['comp','bphi','btheta',]
-    def __init__(self, dirpath=None, n=1):
+    def __init__(self, dirpath=None, n=1, xtra_stride = 1):
         self.dir = dirpath
-        self.xtra_stride = 1
+        self.xtra_stride = xtra_stride
 
         self.n=str(n).zfill(3)
         ### add the ions

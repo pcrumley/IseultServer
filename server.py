@@ -83,7 +83,7 @@ def hist2d_image():
                 'boolstr', 'ybins', 'xbins', 'yvalmin', 'yvalmax', 'xvalmin',
                 'xvalmax', 'normhist','cmap', 'cnorm', 'pow_zero', 'pow_gamma',
                 'vmin', 'clip', 'vmax', 'xmin', 'xmax', 'ymin', 'ymax', 'px',
-                'py', 'aspect', 'mask_zeros', 'interpolation']:
+                'py', 'aspect', 'mask_zeros', 'interpolation', 'xtra_stride']:
         arg = request.args.get(key)
         if arg:
             query_dict[key] = arg

@@ -108,12 +108,13 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                     xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'log',
                     pow_zero = '0', pow_gamma='1.0', vmin = '', clip = 'true',
                     vmax = '', xmin='', xmax ='', ymin='', ymax='', interpolation = 'bicubic',
-                    px ='400', py='400', aspect='auto', mask_zeros='true'):
+                    px ='400', py='400', aspect='auto', mask_zeros='true', xtra_stride = '1'):
     '''First we calculate the histogram, then we turn it into an image and return
     the image as a bytesIO'''
     ### first we open up a tristan sim
     if sim_type =='tristan-mp':
-        cur_sim = TristanSim(outdir, n=int(n))
+        cur_sim = TristanSim(outdir, n = int(n), xtra_stride = int(xtra_stride))
+
     # first we evaluate the boolean string to see what values we should discard:
     bool_arr = parse_boolstr(boolstr, cur_sim, prtl_type)
     # Now we go through an fill out some of the unfilled data needed to make
@@ -147,7 +148,8 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
 
     ####
     #
-    #now we have the histogram, we need to turn it into an image
+    # Now we have the histogram, we need to turn it into an image
+    #
     ###
     if normhist == 'true' and hist.max() != 0:
         hist *= hist.max()**-1

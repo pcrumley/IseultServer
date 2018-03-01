@@ -8,7 +8,7 @@ import io
 import base64
 
 class myNumbaImage(object):
-    '''A class that will handle the image writing
+    '''A object that will handle the image writing
     '''
     def __init__(self, py, px):
         self.py = py #in pixels
@@ -37,7 +37,12 @@ class myNumbaImage(object):
         '''we preserve xlims. and we make a middle about the ylims'''
         self.aspect=arg
     def setInterpolation(self, arg):
-        self.interpolation = arg
+        if arg == 'bicubic':
+            self.interpolation = Image.BICUBIC
+        elif arg == 'nearest':
+            self.interpolation == Image.NEAREST
+        elif arg == 'lanczos':
+            self.interpolation == Image.LANCZOS
     def setCmap(self, cmapStr):
         if cmapStr in myCmaps.keys():
             self.cmap = cmapStr
@@ -111,7 +116,7 @@ class myNumbaImage(object):
         e = (ymax-ymin)/(self.extent[3]-self.extent[2])*self.imgData.shape[0]/self.py
         f = (self.extent[3]-ymax)/(self.extent[3]-self.extent[2])*self.imgData.shape[0] #I'm not 100% sure why this works...
         self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f),
-                                   resample=Image.BICUBIC if self.interpolation == 'bicubic' else Image.NEAREST)
+                                   resample=self.interpolation)
 
         img_io = io.BytesIO()
         self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
@@ -121,8 +126,9 @@ class myNumbaImage(object):
                 'xmax': str(xmax),
                 'ymin': str(ymin),
                 'ymax': str(ymax),
-                'cmin': str(cmin),
-                'cmax': str(cmax)
+                'vmin': str(cmin),
+                'vmax': str(cmax),
+                'cmap': self.cmap
                 }
         return responseDict
 

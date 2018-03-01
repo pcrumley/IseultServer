@@ -3,8 +3,6 @@ from numba import jit, guvectorize, float64, int32
 from math import sqrt, log10
 from tristan_sim import TristanSim
 from numba_imager import myNumbaImage
-import io
-import base64
 import numpy as np
 #import os
 #os.environ['NUMBA_WARNINGS'] = '1'
@@ -172,11 +170,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     hist_img.setCmap(cmap)
     hist_img.set_clim(cmin = None if len(vmin) ==0 else float(vmin), cmax = None if len(vmax)==0 else float(vmax))
     hist_img.set_aspect(0 if aspect=='auto' else 1)
-    hist_img.renderImage()
-    img_io = io.BytesIO()
-    hist_img.img.save(img_io, format='png',compress_level = 1)#, quality=100)
-    img_io.seek(0)
-    return base64.b64encode(img_io.getvalue())
+    return hist_img.renderImageDict()
 
 
 

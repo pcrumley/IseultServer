@@ -4,6 +4,8 @@ from numpy import nan, isnan
 import numpy as np
 from myCmaps import myCmaps
 from PIL import Image
+import io
+import base64
 
 class myNumbaImage(object):
     '''A class that will handle the image writing
@@ -35,7 +37,8 @@ class myNumbaImage(object):
         '''we preserve xlims. and we make a middle about the ylims'''
         self.aspect=arg
     def setCmap(self, cmapStr):
-        self.cmap = cmapStr
+        if cmapStr in myCmaps.keys():
+            self.cmap = cmapStr
     def setNorm(self, normStr, zero = 0.0, gamma = 1.0, clipped = True):
         self.clipped = True
         if normStr == 'linear' or normStr == 'log':
@@ -66,7 +69,7 @@ class myNumbaImage(object):
         if cmax != None:
             self.clim[1] = cmax
 
-    def renderImage(self):
+    def renderImageDict(self):
         '''Render an image from the data'''
         #try:
         # we want to render image that is px by py in size,
@@ -108,6 +111,18 @@ class myNumbaImage(object):
         self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f),
                                    resample=Image.BICUBIC if self.interpolation == 'bicubic' else Image.NEAREST)
 
+        img_io = io.BytesIO()
+        self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
+        img_io.seek(0)
+        responseDict = { 'imgString':'data:image/png;base64,'+base64.b64encode(img_io.getvalue()).decode('utf-8'),
+                'xmin': str(xmin),
+                'xmax': str(xmax),
+                'ymin': str(ymin),
+                'ymax': str(ymax),
+                'cmin': str(cmin),
+                'cmax': str(cmax)
+                }
+        return responseDict
 
 @guvectorize([(uint8[:],)], # img as RBGA 8 bit array
              '(k)', nopython = True, cache = True, target='parallel')

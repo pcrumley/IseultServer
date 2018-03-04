@@ -6,6 +6,7 @@ from myCmaps import myCmaps
 from PIL import Image
 import io
 import base64
+import json
 
 class myNumbaImage(object):
     '''A object that will handle the image writing
@@ -35,7 +36,7 @@ class myNumbaImage(object):
         self.extent = exList
     def set_aspect(self, arg):
         '''we preserve xlims. and we make a middle about the ylims'''
-        self.aspect=arg
+        self.aspect = arg
     def setInterpolation(self, arg):
         if arg == 'bicubic':
             self.interpolation = Image.BICUBIC
@@ -122,12 +123,12 @@ class myNumbaImage(object):
         self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
         img_io.seek(0)
         responseDict = { 'imgString':'data:image/png;base64,'+base64.b64encode(img_io.getvalue()).decode('utf-8'),
-                'xmin': str(xmin),
-                'xmax': str(xmax),
-                'ymin': str(ymin),
-                'ymax': str(ymax),
-                'vmin': str(cmin),
-                'vmax': str(cmax),
+                'xmin': float(xmin),
+                'xmax': float(xmax),
+                'ymin': float(ymin),
+                'ymax': float(ymax),
+                'vmin': float(cmin),
+                'vmax': float(cmax),
                 'cmap': self.cmap
                 }
         return responseDict

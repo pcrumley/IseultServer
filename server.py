@@ -88,7 +88,7 @@ def hist2d_image():
         if arg:
             query_dict[key] = arg
     responseDict = make_2d_hist_img(**query_dict)
-    return jsonify(responseDict)
+    return jsonify(**responseDict)
 
     #return jsonify(query_dict)
     abort(404)

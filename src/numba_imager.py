@@ -77,6 +77,32 @@ class myNumbaImage(object):
         if cmax != None:
             self.clim[1] = cmax
 
+    def renderColorBar(self):
+        '''Render an image from the data'''
+        cmin = self.clim[0]
+        cmax = self.clim[1]
+
+        self.imgData = np.empty((self.data.shape[0],self.data.shape[1],4), dtype = 'uint8')
+        if self.norm =='linear':
+            linearNorm(self.data[::-1,:], cmin, cmax, self.clipped, myCmaps[self.cmap], self.imgData)
+        if self.norm == 'pow':
+            # first we have to calculate some stuff that will be passed to
+            # powerNorm for optimizations
+            cminNormed = powerNormFunc(cmin, self.zero, self.gamma)
+            powNormColorBin = powerNormBin(cmin, cmax, self.zero, self.gamma,myCmaps[self.cmap].shape[0] )
+            powerNormImg(self.data[::-1,:],cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
+        if self.norm == 'log':
+            logNorm(self.data[::-1,:],cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
+
+        self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).resize((self.px,self.py), resample=self.interpolation)
+
+        img_io = io.BytesIO()
+        self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
+        img_io.seek(0)
+        responseDict = { 'cbarString':'data:image/png;base64,'+base64.b64encode(img_io.getvalue()).decode('utf-8'),
+                       }
+        return responseDict
+
     def renderImageDict(self):
         '''Render an image from the data'''
         #try:

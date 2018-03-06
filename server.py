@@ -2,6 +2,7 @@ from flask import Flask, send_file, request, abort, jsonify, make_response, curr
 import sys
 sys.path.insert(0, './src/')
 from particle_hist import make_2d_hist_img
+from color_bar import make_color_bar
 from datetime import timedelta
 from functools import update_wrapper
 app = Flask(__name__)
@@ -92,5 +93,21 @@ def hist2d_image():
 
     #return jsonify(query_dict)
     abort(404)
+
+@app.route('/api/colorbar/')
+@crossdomain(origin='*')
+def colorbar_image():
+    query_dict = {}
+    for key in ['cmap', 'cnorm', 'pow_zero', 'pow_gamma', 'vmin', 'vmax', 'clip',
+                'interpolation', 'px', 'py', 'alignment']:
+        arg = request.args.get(key)
+        if arg:
+            query_dict[key] = arg
+    responseDict = make_color_bar(**query_dict)
+    return jsonify(**responseDict)
+
+    #return jsonify(query_dict)
+    abort(404)
+
 if __name__=='__main__':
     app.run(port=5000, debug=True)

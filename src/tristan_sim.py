@@ -28,11 +28,11 @@ class Particles(object):
         self.__prtl_types.append(name)
         self.quantities = []
     def load_saved_quantities(self, key):
-        #try:
+        try:
             with h5py.File(os.path.join(self.sim.dir,'prtl.tot.'+self.sim.n),'r') as f:
                 return f[key][::self.sim.xtra_stride]
-        #except IOError:
-        #    return np.array([])
+        except IOError:
+            return np.array([])
 
 
     @classmethod
@@ -116,7 +116,7 @@ class Electrons(Particles):
     @cached_property
     def gamma(self):
         # an example of a calculated quantity could use
-        #return self.load_saved_quantities('proci')
+        #return self.load_saved_quantities('proce')
         return np.sqrt(self.px**2+self.py**2+self.pz**2+1)
 
     @cached_property

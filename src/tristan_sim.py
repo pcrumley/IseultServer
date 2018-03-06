@@ -45,6 +45,10 @@ class Ions(Particles):
     def __init__(self, sim, name='ions'):
         Particles.__init__(self, sim, name)
         self.quantities= ['x','y','z','px','py','pz', 'gamma', 'proc', 'index']
+        # YOU WRITE AS IF LaTeX BUT YOU MUST DOUBLE ESCAPE '\' CHARACTER
+        self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
+                           '\\gamma_i\\beta_{i,x}', '\\gamma_i\\beta_{i,y}', '\\gamma_i\\beta_{i,z}',
+                           '\\gamma_i', '\\mathrm{proc_i}','\\mathrm{ind_i}']
 
     @cached_property
     def x(self):
@@ -88,7 +92,11 @@ class Electrons(Particles):
     '''The electron subclass'''
     def __init__(self, sim, name='electrons'):
         Particles.__init__(self, sim, name)
-        self.quantities= ['x','y','z','px','py','pz', 'gamma', 'proc', 'index']
+        self.quantities = ['x','y','z','px','py','pz', 'gamma', 'proc', 'index']
+        # YOU WRITE AS IF LaTeX BUT YOU MUST DOUBLE ESCAPE '\'  CHARACTER
+        self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
+                           '\\gamma_e\\beta_{x,e}', '\\gamma_e\\beta_{y,e}', '\\gamma_e\\beta_{z,e}',
+                           '\\gamma_e', '\\mathrm{proc_e}','\\mathrm{ind_e}']
     @cached_property
     def x(self):
         return self.load_saved_quantities('xe')/self.sim.comp
@@ -145,6 +153,12 @@ class TristanSim(object):
         self.electrons = Electrons(self, name='electrons')
 
 
+    def get_avail_prtl_quantities(self):
+        prtl_obj = {}
+        for prtl in Particles.get_prtls():
+            prtl_obj[prtl] ={'quantities': getattr(getattr(self,prtl),'quantities'),
+                             'axisLabels': getattr(getattr(self,prtl),'axislabels')}
+        return prtl_obj
     def load_param(self, key):
         try:
             with h5py.File(os.path.join(self.dir,'param.'+self.n),'r') as f:
@@ -261,3 +275,4 @@ if __name__=='__main__':
     mySim = TristanSim('../test_output')
     for prtl in Particles.get_prtls():
         print(getattr(getattr(mySim,prtl),'x'))
+    #print(mySim.get_avail_prtl_quantities())

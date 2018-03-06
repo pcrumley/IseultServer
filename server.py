@@ -4,6 +4,7 @@ sys.path.insert(0, './src/')
 from particle_hist import make_2d_hist_img
 from color_bar import make_color_bar
 from datetime import timedelta
+from tristan_sim import TristanSim
 from functools import update_wrapper
 app = Flask(__name__)
 
@@ -104,6 +105,19 @@ def colorbar_image():
         if arg:
             query_dict[key] = arg
     responseDict = make_color_bar(**query_dict)
+    return jsonify(**responseDict)
+
+    #return jsonify(query_dict)
+    abort(404)
+
+@app.route('/api/prtl_quants/')
+@crossdomain(origin='*')
+def get_prtl_quants():
+    query_dict = {}
+    for key in ['sim_type']:
+        arg = request.args.get(key)
+        if arg == 'tristan-mp':
+            responseDict = TristanSim().get_avail_prtl_quantities()
     return jsonify(**responseDict)
 
     #return jsonify(query_dict)

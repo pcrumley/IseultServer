@@ -6,6 +6,8 @@ from color_bar import make_color_bar
 from datetime import timedelta
 from tristan_sim import TristanSim
 from functools import update_wrapper
+from myCmaps import myCmaps_names
+
 app = Flask(__name__)
 
 def crossdomain(origin=None, methods=None, headers=None, max_age=21600, attach_to_all=True, automatic_options=True):
@@ -90,7 +92,7 @@ def hist2d_image():
         if arg:
             query_dict[key] = arg
     responseDict = make_2d_hist_img(**query_dict)
-    return jsonify(**responseDict)
+    return jsonify(responseDict)
 
     #return jsonify(query_dict)
     abort(404)
@@ -105,7 +107,7 @@ def colorbar_image():
         if arg:
             query_dict[key] = arg
     responseDict = make_color_bar(**query_dict)
-    return jsonify(**responseDict)
+    return jsonify(responseDict)
 
     #return jsonify(query_dict)
     abort(404)
@@ -118,8 +120,15 @@ def get_prtl_quants():
         arg = request.args.get(key)
         if arg == 'tristan-mp':
             responseDict = TristanSim().get_avail_prtl_quantities()
-    return jsonify(**responseDict)
+    return jsonify(responseDict)
 
+    #return jsonify(query_dict)
+    abort(404)
+
+@app.route('/api/cmaps/')
+@crossdomain(origin='*')
+def get_cmaps():
+    return jsonify(myCmaps_names)
     #return jsonify(query_dict)
     abort(404)
 

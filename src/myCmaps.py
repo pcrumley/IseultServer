@@ -1555,3 +1555,4 @@ for k in keys:
     myCmaps[k] = np.array(makeMappingArray(256,get_cmap(k))[:,0:3]*255, dtype = 'uint8')
 myCmaps['Spectral'] = np.array(makeMappingArray(256,get_cmap('Spectral_r'))[:,0:3]*255, dtype = 'uint8')
 myCmaps['BuYlRd'] = np.array(makeMappingArray(256,get_cmap('RdYlBu_r'))[:,0:3]*255, dtype = 'uint8')
+myCmaps_names = [key for key in myCmaps.keys()]

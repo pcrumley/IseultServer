@@ -40,10 +40,10 @@ class myNumbaImage(object):
     def setInterpolation(self, arg):
         if arg == 'bicubic':
             self.interpolation = Image.BICUBIC
-        elif arg == 'nearest':
-            self.interpolation == Image.NEAREST
         elif arg == 'lanczos':
-            self.interpolation == Image.LANCZOS
+            self.interpolation = Image.LANCZOS
+        else:
+            self.interpolation = Image.NEAREST
     def setCmap(self, cmapStr):
         if cmapStr in myCmaps.keys():
             self.cmap = cmapStr

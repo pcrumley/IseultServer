@@ -112,25 +112,21 @@ def colorbar_image():
     #return jsonify(query_dict)
     abort(404)
 
-@app.route('/api/prtl_quants/')
+@app.route('/api/openSim/')
 @crossdomain(origin='*')
-def get_prtl_quants():
+def open_simulation():
     query_dict = {}
+    responseDict = {}
     for key in ['sim_type']:
         arg = request.args.get(key)
         if arg == 'tristan-mp':
-            responseDict = TristanSim().get_avail_prtl_quantities()
+            responseDict = TristanSim().get_avail_prtls()
+    responseDict['cmaps']= myCmaps_names
     return jsonify(responseDict)
 
     #return jsonify(query_dict)
     abort(404)
 
-@app.route('/api/cmaps/')
-@crossdomain(origin='*')
-def get_cmaps():
-    return jsonify(myCmaps_names)
-    #return jsonify(query_dict)
-    abort(404)
 
 if __name__=='__main__':
     app.run(port=5000, debug=True)

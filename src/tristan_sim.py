@@ -153,10 +153,11 @@ class TristanSim(object):
         self.electrons = Electrons(self, name='electrons')
 
 
-    def get_avail_prtl_quantities(self):
+    def get_avail_prtls(self):
         prtl_obj = {}
+        prtl_obj['prtls'] = {}
         for prtl in Particles.get_prtls():
-            prtl_obj[prtl] ={'quantities': getattr(getattr(self,prtl),'quantities'),
+            prtl_obj['prtls'][prtl]= {'quantities': getattr(getattr(self,prtl),'quantities'),
                              'axisLabels': getattr(getattr(self,prtl),'axislabels')}
         return prtl_obj
     def load_param(self, key):

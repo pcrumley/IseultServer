@@ -4,9 +4,8 @@ sys.path.insert(0, './src/')
 from particle_hist import make_2d_hist_img
 from color_bar import make_color_bar
 from datetime import timedelta
-from tristan_sim import TristanSim
+from open_sim import open_sim
 from functools import update_wrapper
-from myCmaps import myCmaps_names
 
 app = Flask(__name__)
 
@@ -117,14 +116,11 @@ def colorbar_image():
 def open_simulation():
     query_dict = {}
     responseDict = {}
-    for key in ['sim_type']:
+    for key in ['sim_type', 'outdir']:
         arg = request.args.get(key)
-        if arg == 'tristan-mp':
-            responseDict = TristanSim().get_avail_prtls()
-    responseDict['cmaps']= myCmaps_names
-    return jsonify(responseDict)
-
-    #return jsonify(query_dict)
+        if arg:
+            query_dict[key] = arg
+    return jsonify(open_sim(**query_dict))
     abort(404)
 
 

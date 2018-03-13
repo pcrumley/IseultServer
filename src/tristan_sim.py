@@ -1,4 +1,4 @@
-import os
+import re, os
 import numpy as np
 import h5py
 
@@ -153,6 +153,39 @@ class TristanSim(object):
         self.electrons = Electrons(self, name='electrons')
 
 
+    def get_file_nums(self):
+        try:
+            # create a bunch of regular expressions used to search for files
+            f_re = re.compile('flds.tot.*')
+            prtl_re = re.compile('prtl.tot.*')
+            s_re = re.compile('spect.*')
+            param_re = re.compile('param.*')
+
+            # Create a dictionary of all the paths to the files
+            self.PathDict = {'Flds': [], 'Prtl': [], 'Param': [], 'Spect': []}
+            self.PathDict['Flds']= filter(f_re.match, os.listdir(self.dir))
+            self.PathDict['Prtl']= filter(prtl_re.match, os.listdir(self.dir))
+            self.PathDict['Spect']= filter(s_re.match, os.listdir(self.dir))
+            self.PathDict['Param']= filter(param_re.match, os.listdir(self.dir))
+
+            ### iterate through the Paths and just get the .nnn number
+            for key in self.PathDict.keys():
+                for i in range(len(self.PathDict[key])):
+                    try:
+                        self.PathDict[key][i] = int(self.PathDict[key][i].split('.')[-1])
+                    except ValueError:
+                        self.PathDict[key].pop(i)
+                    except IndexError:
+                        pass
+
+            ### GET THE NUMBERS THAT HAVE ALL 4 FILES:
+            allFour = set(self.PathDict['Param'])
+            for key in self.PathDict.keys():
+                allFour &= set(self.PathDict[key])
+            allFour = sorted(allFour)
+            return list(allFour)
+        except OSError:
+            return []
     def get_avail_prtls(self):
         prtl_obj = {}
         prtl_obj['prtls'] = {}

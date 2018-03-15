@@ -49,7 +49,7 @@ class Ions(Particles):
         self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
                            '\\gamma_i\\beta_{i,x}', '\\gamma_i\\beta_{i,y}', '\\gamma_i\\beta_{i,z}',
                            '\\gamma_i', '\\mathrm{proc_i}','\\mathrm{ind_i}']
-        self.histLabel = ['f_i (p)']
+        self.histLabel = 'f_i (p)'
     @cached_property
     def x(self):
         return self.load_saved_quantities('xi')/self.sim.comp
@@ -97,7 +97,7 @@ class Electrons(Particles):
         self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
                            '\\gamma_e\\beta_{x,e}', '\\gamma_e\\beta_{y,e}', '\\gamma_e\\beta_{z,e}',
                            '\\gamma_e', '\\mathrm{proc_e}','\\mathrm{ind_e}']
-        self.histLabel = ['f_e (p)']
+        self.histLabel = 'f_e (p)'
     @cached_property
     def x(self):
         return self.load_saved_quantities('xe')/self.sim.comp

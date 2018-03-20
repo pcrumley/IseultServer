@@ -75,8 +75,9 @@ def field_image():
 """
 
 @app.route('/api/handshake')
+@crossdomain(origin='*')
 def handshake():
-    return jsonify({name:'IseultServer', version: 'alpha'})
+    return jsonify({'name':'IseultServer', 'version': 'alpha'})
 
 @app.route('/api/2dhist/imgs/')
 @crossdomain(origin='*')

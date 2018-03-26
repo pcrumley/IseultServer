@@ -143,7 +143,7 @@ class TristanSim(object):
     defined as a class that extends this object.'''
     params = ['comp','bphi','btheta',]
     def __init__(self, dirpath=None, n=1, xtra_stride = 1):
-        self.dir = dirpath
+        self.dir = str(dirpath)
         self.xtra_stride = xtra_stride
 
         self.n=str(n).zfill(3)
@@ -164,10 +164,10 @@ class TristanSim(object):
 
             # Create a dictionary of all the paths to the files
             self.PathDict = {'Flds': [], 'Prtl': [], 'Param': [], 'Spect': []}
-            self.PathDict['Flds']= filter(f_re.match, os.listdir(self.dir))
-            self.PathDict['Prtl']= filter(prtl_re.match, os.listdir(self.dir))
-            self.PathDict['Spect']= filter(s_re.match, os.listdir(self.dir))
-            self.PathDict['Param']= filter(param_re.match, os.listdir(self.dir))
+            self.PathDict['Flds']= [item for item in filter(f_re.match, os.listdir(self.dir))]
+            self.PathDict['Prtl']= [item for item in filter(prtl_re.match, os.listdir(self.dir))]
+            self.PathDict['Spect']= [item for item in filter(s_re.match, os.listdir(self.dir))]
+            self.PathDict['Param']= [item for item in filter(param_re.match, os.listdir(self.dir))]
 
             ### iterate through the Paths and just get the .nnn number
             for key in self.PathDict.keys():

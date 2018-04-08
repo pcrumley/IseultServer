@@ -141,10 +141,10 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     xvalmax = xarr.max() if len(xvalmax)==0 else float(xvalmax)
 
     if len(warr)==0:
-        hist = Fast2DHist(yarr, xarr, yvalmin, yvalmax, int(ybins), xvalmin, xvalmax, int(xbins))
+        hist = Fast2DHist(yarr, xarr, yvalmin, yvalmax, int(float(ybins)), xvalmin, xvalmax, int(float(xbins)))
     else:
         #calculate unweighed histogram
-        hist = Fast2DWeightedHist(yarr, xarr, warr, yvalmin, yvalmax, int(ybins), xvalmin, xvalmax, int(xbins))
+        hist = Fast2DWeightedHist(yarr, xarr, warr, yvalmin, yvalmax, int(float(ybins)), xvalmin, xvalmax, int(float(xbins)))
 
     ####
     #
@@ -164,11 +164,11 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     hist_img.set_ylim(ymin = None if len(ymin)==0 else float(ymin),
                       ymax = None if len(ymax)==0 else float(ymax))
     if cnorm =='log':
-        hist_img.setNorm('log',clipped = True if clip =='true' else False)
+        hist_img.setNorm('log', clipped = True if clip =='true' else False)
     if cnorm =='linear':
-        hist_img.setNorm('linear',clipped = True if clip =='true' else False)
+        hist_img.setNorm('linear', clipped = True if clip =='true' else False)
     if cnorm =='pow':
-        hist_img.setNorm('pow',zero = float(pow_zero), gamma = float(pow_gamma),clipped = True if clip =='true' else False)
+        hist_img.setNorm('pow',zero = float(pow_zero), gamma = float(pow_gamma), clipped = True if clip =='true' else False)
     hist_img.setCmap(cmap)
     hist_img.set_clim(cmin = None if len(vmin) ==0 else float(vmin), cmax = None if len(vmax)==0 else float(vmax))
     hist_img.set_aspect(0 if aspect=='auto' else 1)

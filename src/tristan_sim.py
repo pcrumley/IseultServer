@@ -44,11 +44,11 @@ class Ions(Particles):
 
     def __init__(self, sim, name='ions'):
         Particles.__init__(self, sim, name)
-        self.quantities= ['x','y','z','px','py','pz', 'gamma', 'proc', 'index']
+        self.quantities= ['x','y','z','px','py','pz', 'gamma', 'proc', 'index', 'charge']
         # YOU WRITE AS IF LaTeX BUT YOU MUST DOUBLE ESCAPE '\' CHARACTER
         self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
                            '\\gamma_i\\beta_{i,x}', '\\gamma_i\\beta_{i,y}', '\\gamma_i\\beta_{i,z}',
-                           '\\gamma_i', '\\mathrm{proc_i}','\\mathrm{ind_i}']
+                           '\\gamma_i', '\\mathrm{proc_i}','\\mathrm{ind_i}', '\\q_i']
         self.histLabel = 'f_i (p)'
     @cached_property
     def x(self):
@@ -75,6 +75,10 @@ class Ions(Particles):
         return self.load_saved_quantities('wi')
 
     @cached_property
+    def charge(self):
+        return self.load_saved_quantities('chi')
+
+    @cached_property
     def gamma(self):
         # an example of a calculated quantity
         #return self.load_saved_quantities('proci')
@@ -92,11 +96,11 @@ class Electrons(Particles):
     '''The electron subclass'''
     def __init__(self, sim, name='electrons'):
         Particles.__init__(self, sim, name)
-        self.quantities = ['x','y','z','px','py','pz', 'gamma', 'proc', 'index']
+        self.quantities = ['x','y','z','px','py','pz', 'gamma', 'proc', 'index', 'charge']
         # YOU WRITE AS IF LaTeX BUT YOU MUST DOUBLE ESCAPE '\'  CHARACTER
         self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
                            '\\gamma_e\\beta_{x,e}', '\\gamma_e\\beta_{y,e}', '\\gamma_e\\beta_{z,e}',
-                           '\\gamma_e', '\\mathrm{proc_e}','\\mathrm{ind_e}']
+                           '\\gamma_e', '\\mathrm{proc_e}','\\mathrm{ind_e}', '\\q_e']
         self.histLabel = 'f_e (p)'
     @cached_property
     def x(self):
@@ -121,6 +125,10 @@ class Electrons(Particles):
     @cached_property
     def pz(self):
         return self.load_saved_quantities('we')
+
+    @cached_property
+    def charge(self):
+        return self.load_saved_quantities('che')
 
     @cached_property
     def gamma(self):

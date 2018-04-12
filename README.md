@@ -24,7 +24,7 @@ $  ssh -N -f -L localhost:5001:localhost:5000 <USER>@tigressdata.princeton.edu
 The above code makes it so you can access the IseultServer at localhost:5001.
 
 The python code that provides the RESTful api is located in the ./src/ directory. 
-You can easily make new APIs for different simulations using the templates as a starting point.
+You can easily make new APIs for different simulations using ./src/tristan_sim.py as a starting point.
 
 The data will eventually be visualized with Iseult.js&mdash;a javascript front-end for the server located 
 here: http://github.com/pcrumley/Iseultjs The directory is private for now, but I plan on hosting it online 
@@ -35,6 +35,10 @@ editing the urls to handle the calls.
 
 Watch this space!
 
+# todo
+Add access to field & spectral quantities.
+Make rendering images more efficient by not rendering full image then resizing as is currently done
+....
 
 | Dependencies: |
 | ------------ |
@@ -46,3 +50,5 @@ Watch this space!
 | h5py&mdash;http://h5py.org |
 
 These things are in the default anaconda package. If the installation becomes more complicated I will detail it here.
+
+

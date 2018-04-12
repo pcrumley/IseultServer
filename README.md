@@ -35,6 +35,42 @@ editing the urls to handle the calls.
 
 Watch this space!
 
+# Installing Dependencies
+
+It is recommended to setup a virtual python environment to keep all the right dependencies. You can either do this with anaconda, or with pip.
+
+## Anaconda
+
+You can create a virtual environment with anaconda using the following command:
+```bash
+$ conda create -n yourenvname python=3.6 anaconda
+$ source activate yourenvname
+```
+Note this will create a new directory `.conda` in your current directory that contains all the packages necessary for the environment. It is recommended you choose a directory that has reasonable storage quota (many clusters limit the home directory to a very small quota). To install the dependencies, use the following command:
+```bash
+$ conda install --yes --file requirements.txt
+```
+Now you should have all the required python packages installed to run the server. To exit from the virtual environment, use
+```bash
+$ source deactivate
+```
+
+## Pip
+
+You need the python package `virtualenv` installed. To create a virtual environment, use the following commands:
+```bash
+$ virtualenv yourenvname
+$ source ./yourenvname/bin/activate
+```
+Similar to the conda solution, this creates a directory under the current path that contains the necessary package and environment files. To install the dependencies, use:
+```bash
+$ pip install -r requirements.txt
+```
+To exit the environment, simply use:
+```bash
+$ deactivate
+```
+
 # todo
 Add access to field & spectral quantities.
 Make rendering images more efficient by not rendering full image then resizing as is currently done

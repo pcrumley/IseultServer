@@ -57,7 +57,11 @@ $ source deactivate
 
 ## Pip
 
-You need the python package `virtualenv` installed. To create a virtual environment, use the following commands:
+Anaconda is the easier way to get numba installed on your machine since is include prebuilt binaries for llvmlite. 
+If you prefer to use pip, you must first build llvmlite yourself or install it via anaconda. See here for details
+http://llvmlite.pydata.org/en/latest/admin-guide/install.html
+
+Then, you need the python package `virtualenv` installed. To create a virtual environment, use the following commands:
 ```bash
 $ virtualenv yourenvname
 $ source ./yourenvname/bin/activate
@@ -71,7 +75,7 @@ To exit the environment, simply use:
 $ deactivate
 ```
 
-# todo
+## todo
 Add access to field & spectral quantities.
 Make rendering images more efficient by not rendering full image then resizing as is currently done
 ....

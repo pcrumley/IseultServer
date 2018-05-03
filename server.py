@@ -50,7 +50,7 @@ def crossdomain(origin=None, methods=None, headers=None, max_age=21600, attach_t
 
 
 @app.route('/api/handshake')
-@crossdomain(origin='*')
+@crossdomain(origin='http://localhost:8080')
 def handshake():
     return jsonify({'name':'IseultServer',
                     'version': 'alpha',
@@ -58,7 +58,7 @@ def handshake():
                     'server_dir': os.path.split(os.path.abspath(os.curdir))[0]})
 
 @app.route('/api/2dhist/imgs/')
-@crossdomain(origin='*')
+@crossdomain(origin='http://localhost:8080')
 def hist2d_image():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'yval', 'xval', 'weights',
@@ -77,7 +77,7 @@ def hist2d_image():
 
 @app.route('/dirs/', defaults={'req_path': ''})
 @app.route('/dirs/<path:req_path>')
-@crossdomain(origin='*')
+@crossdomain(origin='http://localhost:8080')
 def dir_listing(req_path):
     BASE_DIR = '/'
 
@@ -104,7 +104,7 @@ def dir_listing(req_path):
     return jsonify({'parentDir': os.path.split(abs_path)[0], 'dirs': dirList, 'files': fileList})
 
 @app.route('/api/colorbar/')
-@crossdomain(origin='*')
+@crossdomain(origin='http://localhost:8080')
 def colorbar_image():
     query_dict = {}
     for key in ['cmap', 'cnorm', 'pow_zero', 'pow_gamma', 'vmin', 'vmax', 'clip',
@@ -119,7 +119,7 @@ def colorbar_image():
     abort(404)
 
 @app.route('/api/openSim/')
-@crossdomain(origin='*')
+@crossdomain(origin='http://localhost:8080')
 def open_simulation():
     query_dict = {}
     responseDict = {}

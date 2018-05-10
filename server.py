@@ -70,6 +70,10 @@ def hist2d_image():
         if arg:
             query_dict[key] = arg
     responseDict = make_2d_hist_img(**query_dict)
+    responseDict['i'] = int(request.args.get('i'))
+    responseDict['imgX'] = int(request.args.get('px'))
+    responseDict['imgY'] = int(request.args.get('py'))
+    responseDict['url'] = request.url
     return jsonify(responseDict)
 
     #return jsonify(query_dict)

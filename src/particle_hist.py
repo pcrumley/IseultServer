@@ -1,12 +1,43 @@
 from numpy import zeros, nan
-from numba import jit, guvectorize, float64, int32
+from numba import jit, guvectorize, float64, int32, float64, b1
 from math import sqrt, log10
 from tristan_sim import TristanSim
 from numba_imager import myNumbaImage
+from point_in_polygon import point_in_polygon
 import numpy as np
 #import os
 #os.environ['NUMBA_WARNINGS'] = '1'
 ### SOME STUFF FOR THE NUMBA HIST
+
+
+@jit(nopython=True)#
+def FastHist(x1, min1, max1, bnum1):
+    hist= zeros(bnum1)
+    b1_w = ((max1-min1)/bnum1)**-1
+    if len(x1)>0:
+        for i in range(len(x1)):
+            if x1[i]>=min1:
+                if x1[i] == max1:
+                    j = bnum1-1
+                else:
+                    j = (x1[i]-min1)*b1_w
+                if j<bnum1:
+                    hist[int(j)] += 1
+    return hist
+@jit(nopython=True)#
+def FastWeightedHist(x1, min1, max1, bnum1):
+    hist= zeros(bnum1)
+    b1_w = ((max1-min1)/bnum1)**-1
+    if len(x1)>0:
+        for i in range(len(x1)):
+            if x1[i]>=min1:
+                if x1[i] == max1:
+                    j = bnum1-1
+                else:
+                    j = (x1[i]-min1)*b1_w
+                if j<bnum1:
+                    hist[int(j)] += 1
+    return hist
 
 @jit(nopython=True)#
 def Fast2DHist(x1, x2, min1, max1, bnum1, min2,max2, bnum2):
@@ -102,13 +133,79 @@ def parse_boolstr(boolstr, sim, prtl_type):
         else:
             return
 
+def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
+                 xval='', weights = '', boolstr = '', xbins ='200', xvalmin = '',
+                    xvalmax = '', xtra_stride = '1'):
+    '''First we calculate the histogram, then we turn it into an image and return
+    the image as a bytesIO'''
+    ### first we open up a tristan sim
+    if sim_type =='tristan-mp':
+        cur_sim = TristanSim(outdir, n = int(n), xtra_stride = int(xtra_stride))
+
+    # first we evaluate the boolean string to see what values we should discard:
+    bool_arr = parse_boolstr(boolstr, cur_sim, prtl_type)
+    # Now we go through an fill out some of the unfilled data needed to make
+    # a histogram
+    if bool_arr is None:
+        xarr = getattr(getattr(cur_sim, prtl_type), xval)
+        if len(weights)!=0:
+            warr = getattr(getattr(cur_sim, prtl_type), weights)
+        else:
+            warr = np.array([])
+    else:
+        xarr = getattr(getattr(cur_sim, prtl_type), xval)[bool_arr]
+        if len(weights)!=0:
+            warr = getattr(getattr(cur_sim, prtl_type), weights)[bool_arr]
+        else:
+            warr = np.array([])
+
+    xvalmin = xarr.min() if len(xvalmin)==0 else float(xvalmin)
+    xvalmax = xarr.max() if len(xvalmax)==0 else float(xvalmax)
+
+    if len(warr)==0:
+        hist = Fast2DHist(yarr, xarr, yvalmin, yvalmax, int(float(ybins)), xvalmin, xvalmax, int(float(xbins)))
+
+    else:
+        #calculate unweighed histogram
+        hist = Fast2DWeightedHist(yarr, xarr, warr, yvalmin, yvalmax, int(float(ybins)), xvalmin, xvalmax, int(float(xbins)))
+
+    ####
+    #
+    # Now we have the histogram, we need to turn it into a JSON compatible with
+    # D3 hist function.
+    #
+    ###
+    if normhist == 'true' and hist.max() != 0:
+        hist *= hist.max()**-1
+    if mask_zeros =='true':
+        hist[hist==0] = np.nan
+    hist_img = myNumbaImage(int(py), int(px))
+    hist_img.setInterpolation(interpolation)
+    hist_img.setData(hist)
+    hist_img.setExtent([xvalmin,xvalmax,yvalmin, yvalmax])
+    hist_img.set_xlim(xmin = None if len(xmin)==0 else float(xmin),
+                      xmax = None if len(xmax)==0 else float(xmax))
+    hist_img.set_ylim(ymin = None if len(ymin)==0 else float(ymin),
+                      ymax = None if len(ymax)==0 else float(ymax))
+    if cnorm =='log':
+        hist_img.setNorm('log', clipped = True if clip =='true' else False)
+    if cnorm =='linear':
+        hist_img.setNorm('linear', clipped = True if clip =='true' else False)
+    if cnorm =='pow':
+        hist_img.setNorm('pow',zero = float(pow_zero), gamma = float(pow_gamma), clipped = True if clip =='true' else False)
+    hist_img.setCmap(cmap)
+    hist_img.set_clim(cmin = None if len(vmin) ==0 else float(vmin), cmax = None if len(vmax)==0 else float(vmax))
+    hist_img.set_aspect(0 if aspect=='auto' else 1)
+    return hist_img.renderImageDict()
+
 def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                     yval='', xval='', weights = '', boolstr = '', ybins = '200',
                     xbins ='200', yvalmin='', yvalmax='', xvalmin = '',
                     xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'log',
                     pow_zero = '0', pow_gamma='1.0', vmin = '', clip = 'true',
                     vmax = '', xmin='', xmax ='', ymin='', ymax='', interpolation = 'bicubic',
-                    px ='400', py='400', aspect='auto', mask_zeros='true', xtra_stride = '1'):
+                    px ='400', py='400', aspect='auto', mask_zeros='true', xtra_stride = '1',
+                    selPolyXval= '', selPolyYval='', selPolyXarr='', selPolyYarr=''):
     '''First we calculate the histogram, then we turn it into an image and return
     the image as a bytesIO'''
     ### first we open up a tristan sim
@@ -122,6 +219,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     if bool_arr is None:
         yarr = getattr(getattr(cur_sim, prtl_type), yval)
         xarr = getattr(getattr(cur_sim, prtl_type), xval)
+
         if len(weights)!=0:
             warr = getattr(getattr(cur_sim, prtl_type), weights)
         else:
@@ -134,6 +232,20 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
         else:
             warr = np.array([])
 
+    # NOW WE APPLY THE POLYGON:
+    if (len(selPolyXval) != 0):
+        inside = np.zeros(len(xarr), dtype='bool')
+        datX = getattr(getattr(cur_sim, prtl_type), selPolyXval)
+        datX = datX if bool_arr is None else datX[bool_arr]
+        datY = getattr(getattr(cur_sim, prtl_type), selPolyYval)
+        datY = datY if bool_arr is None else datY[bool_arr]
+
+        polyX = np.fromstring(selPolyXarr, sep=',')
+        polyY = np.fromstring(selPolyYarr, sep=',')
+        bbox = np.array([polyX.min(), polyX.max(), polyY.min(), polyY.max()])
+        point_in_polygon(datX, datY, polyX, polyY, bbox, inside)
+        xarr = xarr[inside]
+        yarr = yarr[inside]
 
     yvalmin = yarr.min() if len(yvalmin)==0 else float(yvalmin)
     yvalmax = yarr.max() if len(yvalmax)==0 else float(yvalmax)

@@ -57,6 +57,28 @@ def handshake():
                     'sim_types': ['tristan-mp'],
                     'server_dir': os.path.split(os.path.abspath(os.curdir))[0]})
 
+@app.route('/api/1dhist/')
+@crossdomain(origin='http://localhost:8080')
+def hist1d():
+    query_dict = {}
+    for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'weights',
+                'boolstr',  'xbins', 'xvalmin',
+                'xvalmax', 'normhist','cmap', 'cnorm', 'pow_zero', 'pow_gamma',
+                'vmin', 'clip', 'vmax', 'xmin', 'xmax', 'ymin', 'ymax', 'px',
+                'py', 'aspect', 'mask_zeros', 'interpolation', 'xtra_stride',
+                'selPolyXval', 'selPolyYval', 'selPolyXarr', 'selPolyYarr' ]:
+        arg = request.args.get(key)
+        if arg:
+            query_dict[key] = arg
+    responseDict = make_2d_hist_img(**query_dict)
+    responseDict['i'] = int(request.args.get('i'))
+    responseDict['imgX'] = int(request.args.get('px'))
+    responseDict['imgY'] = int(request.args.get('py'))
+    responseDict['url'] = request.url
+    return jsonify(responseDict)
+
+    #return jsonify(query_dict)
+    abort(404)
 @app.route('/api/2dhist/imgs/')
 @crossdomain(origin='http://localhost:8080')
 def hist2d_image():
@@ -65,7 +87,8 @@ def hist2d_image():
                 'boolstr', 'ybins', 'xbins', 'yvalmin', 'yvalmax', 'xvalmin',
                 'xvalmax', 'normhist','cmap', 'cnorm', 'pow_zero', 'pow_gamma',
                 'vmin', 'clip', 'vmax', 'xmin', 'xmax', 'ymin', 'ymax', 'px',
-                'py', 'aspect', 'mask_zeros', 'interpolation', 'xtra_stride']:
+                'py', 'aspect', 'mask_zeros', 'interpolation', 'xtra_stride',
+                'selPolyXval', 'selPolyYval', 'selPolyXarr', 'selPolyYarr']:
         arg = request.args.get(key)
         if arg:
             query_dict[key] = arg
@@ -117,10 +140,9 @@ def colorbar_image():
         if arg:
             query_dict[key] = arg
     responseDict = make_color_bar(**query_dict)
+    responseDict['url'] = request.url
     return jsonify(responseDict)
 
-    #return jsonify(query_dict)
-    abort(404)
 
 @app.route('/api/openSim/')
 @crossdomain(origin='http://localhost:8080')
@@ -132,7 +154,6 @@ def open_simulation():
         if arg:
             query_dict[key] = arg
     return jsonify(open_sim(**query_dict))
-    abort(404)
 
 
 if __name__=='__main__':

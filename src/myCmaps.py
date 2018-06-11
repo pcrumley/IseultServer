@@ -1548,7 +1548,7 @@ myCmaps ={'hot': _cetHot_dat,
           'Blue-Black-Red': _cetBlueBlackRed_dat,
           'rainbow': _cetRainbowDivering_dat,
           'temperature': _temp_dat,
-          'Blue/Green/Yellow/Red': _bgylrd_dat}
+          'Blue-Green-Yellow-Red': _bgylrd_dat}
 
 keys = ['viridis', 'magma', 'inferno', 'plasma', 'gnuplot', 'gnuplot2', 'coolwarm', 'PuOr', 'RdYlGn', 'PiYG', 'PRGn', 'RdBu', 'winter']
 for k in keys:

@@ -284,6 +284,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     hist_img.setCmap(cmap)
     hist_img.set_clim(cmin = None if len(vmin) ==0 else float(vmin), cmax = None if len(vmax)==0 else float(vmax))
     hist_img.set_aspect(0 if aspect=='auto' else 1)
+    #hist_img.set_aspect(1)# if aspect=='auto' else 1)
     return hist_img.renderImageDict()
 
 

@@ -137,8 +137,11 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                  xval='', weights = '', boolstr = '', xbins ='200', xvalmin = '',
                  xvalmax = '', xtra_stride = '1',
                 selPolyXval = '', selPolyYval = '', selPolyXarr = '', selPolyYarr= ''):
-    '''First we calculate the histogram, then we turn it into an image and return
-    the image as a bytesIO'''
+    '''We calculate a 1D histogram at outdir, and then return a list of dictionaries
+    where each dictinary is  of the form
+    {'num': the number count,
+    'x0': left edge of the bin,
+    'x1': right edge of the bin}.'''
     ### first we open up a tristan sim
     if sim_type =='tristan-mp':
         cur_sim = TristanSim(outdir, n = int(n), xtra_stride = int(xtra_stride))
@@ -177,7 +180,6 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     xvalmin = xarr.min() if len(xvalmin)==0 else float(xvalmin)
     xvalmax = xarr.max() if len(xvalmax)==0 else float(xvalmax)
 
-
     if len(warr)==0:
         hist = FastHist(xarr, xvalmin, xvalmax, int(float(xbins)))
 
@@ -189,13 +191,16 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     #
     # Now we have the histogram, we need to turn it into a JSON compatible with
     # D3 hist function. D3 hist return a sorted array that keeps all of the particle
-    # data. That is not possible in our case.
+    # data. That is not possible in our case due to memory constraints. Instead we
+    # simply return a list
     #
     ###
-    hist1D = []
+
+
     bin_width = (xvalmax-xvalmin)/int(xbins)
-    for i in range(len(hist)):
-        hist1D.append({'num': hist[i], 'x0': bin_width*i, 'x1':bin_width*(i+1)})
+    hist1D = [{'num': hist[i],
+               'x0': bin_width*i,
+               'x1':bin_width*(i+1)} for i in range(len(hist))]
 
     return hist1D
 

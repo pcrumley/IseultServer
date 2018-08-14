@@ -1,7 +1,7 @@
 from flask import Flask, send_file, request, abort, jsonify, make_response, current_app
 import sys, os
 sys.path.insert(0, './src/')
-from particle_hist import make_2d_hist_img
+from particle_hist import make_2d_hist_img, make_1d_hist
 from color_bar import make_color_bar
 from datetime import timedelta
 from open_sim import open_sim
@@ -63,18 +63,14 @@ def hist1d():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'weights',
                 'boolstr',  'xbins', 'xvalmin',
-                'xvalmax', 'normhist','cmap', 'cnorm', 'pow_zero', 'pow_gamma',
-                'vmin', 'clip', 'vmax', 'xmin', 'xmax', 'ymin', 'ymax', 'px',
-                'py', 'aspect', 'mask_zeros', 'interpolation', 'xtra_stride',
+                'xvalmax', 'xmin','xtra_stride',
                 'selPolyXval', 'selPolyYval', 'selPolyXarr', 'selPolyYarr' ]:
         arg = request.args.get(key)
         if arg:
             query_dict[key] = arg
-    responseDict = make_2d_hist_img(**query_dict)
-    responseDict['i'] = int(request.args.get('i'))
-    responseDict['imgX'] = int(request.args.get('px'))
-    responseDict['imgY'] = int(request.args.get('py'))
-    responseDict['url'] = request.url
+    responseDict = make_1d_hist(**query_dict)
+    #responseDict['i'] = int(request.args.get('i'))
+    #responseDict['url'] = request.url
     return jsonify(responseDict)
 
     #return jsonify(query_dict)

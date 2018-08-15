@@ -48,7 +48,7 @@ class myNumbaImage(object):
         if cmapStr in myCmaps.keys():
             self.cmap = cmapStr
     def setNorm(self, normStr, zero = 0.0, gamma = 1.0, clipped = True):
-        self.clipped = True
+        self.clipped = clipped
         if normStr == 'linear' or normStr == 'log':
 
             self.norm = normStr
@@ -90,7 +90,7 @@ class myNumbaImage(object):
             # powerNorm for optimizations
             cminNormed = powerNormFunc(cmin, self.zero, self.gamma)
             powNormColorBin = powerNormBin(cmin, cmax, self.zero, self.gamma,myCmaps[self.cmap].shape[0] )
-            powerNormImg(self.data[::-1,:],cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
+            powerNormImg(self.data[::-1,:],cminNormed, powNormColorBin, self.zero, self.gamma, self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'log':
             logNorm(self.data[::-1,:],cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
 

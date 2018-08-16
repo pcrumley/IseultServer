@@ -62,8 +62,8 @@ def handshake():
 def hist1d():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'weights',
-                'boolstr',  'xbins', 'xvalmin',
-                'xvalmax', 'xmin','xtra_stride',
+                'boolstr',  'xbins', 'xvalmin', 'xscale',
+                'xvalmax', 'xtra_stride',
                 'selPolyXval', 'selPolyYval', 'selPolyXarr', 'selPolyYarr' ]:
         arg = request.args.get(key)
         if arg:

@@ -135,7 +135,7 @@ def parse_boolstr(boolstr, sim, prtl_type):
 
 def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                  xval='', weights = '', boolstr = '', xbins ='200', xvalmin = '',
-                 xvalmax = '', xtra_stride = '1',
+                 xvalmax = '', xtra_stride = '1', xscale = 'linear',
                 selPolyXval = '', selPolyYval = '', selPolyXarr = '', selPolyYarr= ''):
     '''We calculate a 1D histogram at outdir, and then return a list of dictionaries
     where each dictinary is  of the form
@@ -181,12 +181,16 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     xvalmax = xarr.max() if len(xvalmax)==0 else float(xvalmax)
 
     if len(warr)==0:
-        hist = FastHist(xarr, xvalmin, xvalmax, int(float(xbins)))
-
+        if xscale =='log' and xvalmin >0:
+            hist = FastHist(np.log10(xarr), np.log10(xvalmin), np.log10(xvalmax), int(float(xbins)))
+        else:
+            hist = FastHist(xarr, xvalmin, xvalmax, int(float(xbins)))
     else:
         #calculate unweighed histogram
-        hist = FastWeightedHist(xarr, warr, xvalmin, xvalmax, int(float(xbins)))
-
+        if xscale =='log' and xvalmin >0:
+            hist = FastWeightedHist(np.log10(xarr), warr, np.log10(xvalmin), np.log10(xvalmax), int(float(xbins)))
+        else:
+            hist = FastWeightedHist(xarr, warr, xvalmin, xvalmax, int(float(xbins)))
     ####
     #
     # Now we have the histogram, we need to turn it into a JSON compatible with
@@ -197,12 +201,17 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     ###
 
 
-    bin_width = (xvalmax-xvalmin)/int(xbins)
-    hist1D = [{'num': hist[i],
-               'x0': bin_width*i,
-               'x1':bin_width*(i+1)} for i in range(len(hist))]
-
-    return hist1D
+    if xscale =='log' and xvalmin >0:
+        bin_width = (np.log10(xvalmax)-np.log10(xvalmin))/int(xbins)
+        hist1D = [{'num': hist[i],
+                   'x0': 10**(np.log10(xvalmin)+bin_width*i),
+                   'x1': 10**(np.log10(xvalmin)+bin_width*(i+1))} for i in range(len(hist))]
+    else:
+        bin_width = (xvalmax-xvalmin)/int(xbins)
+        hist1D = [{'num': hist[i],
+                   'x0': xvalmin+(bin_width*i),
+                   'x1': xvalmin+(bin_width*(i+1))} for i in range(len(hist))]
+    return {'histData': hist1D, 'xscale': 'log' if xscale =='log' and xvalmin >0 else 'linear'}
 
 def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                     yval='', xval='', weights = '', boolstr = '', ybins = '200',

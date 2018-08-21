@@ -200,7 +200,6 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     #
     ###
 
-
     if xscale =='log' and xvalmin >0:
         bin_width = (np.log10(xvalmax)-np.log10(xvalmin))/int(xbins)
         hist1D = [{'num': hist[i],

@@ -9,6 +9,21 @@ import numpy as np
 #os.environ['NUMBA_WARNINGS'] = '1'
 ### SOME STUFF FOR THE NUMBA HIST
 
+@jit(nopython=True, cache = True)
+def stepify(bins, hist):
+    # make it a step, there probably is a much better way to do this
+    tmp_hist = np.ones(2*len(hist))
+    tmp_bin = np.ones(2*len(hist))
+    for j in range(len(hist)):
+        tmp_hist[2*j] = hist[j]
+        tmp_hist[2*j+1] = hist[j]
+
+        tmp_bin[2*j] = bins[j]
+        if j != 0:
+            tmp_bin[2*j-1] = bins[j]
+        if j == len(hist)-1:
+            tmp_bin[2*j+1] = bins[j+1]
+    return tmp_bin, tmp_hist
 
 @jit(nopython=True)#
 def FastHist(x1, min1, max1, bnum1):
@@ -207,10 +222,18 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                    'x1': 10**(np.log10(xvalmin)+bin_width*(i+1))} for i in range(len(hist))]
     else:
         bin_width = (xvalmax-xvalmin)/int(xbins)
-        hist1D = [{'num': hist[i],
-                   'x0': xvalmin+(bin_width*i),
-                   'x1': xvalmin+(bin_width*(i+1))} for i in range(len(hist))]
-    return {'histData': hist1D, 'xscale': 'log' if xscale =='log' and xvalmin >0 else 'linear'}
+        bins = np.linspace(xvalmin, xvalmax, num = int(xbins)+1)
+        x_arr, y_arr = stepify(bins, hist)
+        hist1D = [{'y': y_arr[i],
+                   'x': x_arr[i]} for i in range(len(x_arr))]
+    return {
+        'histData': hist1D,
+        'xscale': 'log' if xscale =='log' and xvalmin >0 else 'linear',
+        'xmin': hist1D[0]['x'],
+        'xmax': hist1D[-1]['x'],
+        'vmin': np.min(hist),
+        'vmax': np.max(hist)
+        }
 
 def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
                     yval='', xval='', weights = '', boolstr = '', ybins = '200',

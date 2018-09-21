@@ -51,6 +51,7 @@ def crossdomain(origin=None, methods=None, headers=None, max_age=21600, attach_t
 
 @app.route('/api/handshake')
 @crossdomain(origin='http://localhost:8080')
+#@crossdomain(origin='*')
 def handshake():
     return jsonify({'name':'IseultServer',
                     'version': 'alpha',
@@ -153,4 +154,5 @@ def open_simulation():
 
 
 if __name__=='__main__':
+    #app.run(ssl_context='adhoc', port=5000, debug=True)
     app.run(port=5000, debug=True)

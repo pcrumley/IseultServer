@@ -2,6 +2,7 @@ from flask import Flask, send_file, request, abort, jsonify, make_response, curr
 import sys, os
 sys.path.insert(0, './src/')
 from particle_hist import make_2d_hist_img, make_1d_hist
+from particle_moments import  make_1d_moments, make_2d_mom_img
 from color_bar import make_color_bar
 from datetime import timedelta
 from open_sim import open_sim
@@ -76,6 +77,25 @@ def hist1d():
 
     #return jsonify(query_dict)
     abort(404)
+
+@app.route('/api/1dmoments/')
+@crossdomain(origin='http://localhost:8080')
+def mom1d():
+    query_dict = {}
+    for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'yval', 'weights',
+                'boolstr',  'xbins', 'xvalmin', 'xscale',
+                'xvalmax', 'xtra_stride',
+                'selPolyXval', 'selPolyYval', 'selPolyXarr', 'selPolyYarr' ]:
+        arg = request.args.get(key)
+        if arg:
+            query_dict[key] = arg
+    responseDict = make_1d_moments(**query_dict)
+    #responseDict['i'] = int(request.args.get('i'))
+    #responseDict['url'] = request.url
+    return jsonify(responseDict)
+
+    #return jsonify(query_dict)
+    abort(404)
 @app.route('/api/2dhist/imgs/')
 @crossdomain(origin='http://localhost:8080')
 def hist2d_image():
@@ -99,6 +119,29 @@ def hist2d_image():
     #return jsonify(query_dict)
     abort(404)
 
+@app.route('/api/2dmom/imgs/')
+@crossdomain(origin='http://localhost:8080')
+def mom2d_image():
+    query_dict = {}
+    for key in ['outdir','sim_type','n', 'prtl_type', 'yval', 'xval', 'mval',
+                'weights',
+                'boolstr', 'ybins', 'xbins', 'yvalmin', 'yvalmax', 'xvalmin',
+                'xvalmax', 'normhist','cmap', 'cnorm', 'pow_zero', 'pow_gamma',
+                'vmin', 'clip', 'vmax', 'xmin', 'xmax', 'ymin', 'ymax', 'px',
+                'py', 'aspect', 'mask_zeros', 'interpolation', 'xtra_stride',
+                'selPolyXval', 'selPolyYval', 'selPolyXarr', 'selPolyYarr']:
+        arg = request.args.get(key)
+        if arg:
+            query_dict[key] = arg
+    responseDict = make_2d_mom_img(**query_dict)
+    responseDict['i'] = int(request.args.get('i'))
+    responseDict['imgX'] = int(request.args.get('px'))
+    responseDict['imgY'] = int(request.args.get('py'))
+    responseDict['url'] = request.url
+    return jsonify(responseDict)
+
+    #return jsonify(query_dict)
+    abort(404)
 @app.route('/dirs/', defaults={'req_path': ''})
 @app.route('/dirs/<path:req_path>')
 @crossdomain(origin='http://localhost:8080')

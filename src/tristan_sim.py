@@ -44,11 +44,16 @@ class Ions(Particles):
 
     def __init__(self, sim, name='ions'):
         Particles.__init__(self, sim, name)
-        self.quantities= ['x','y','z','px','py','pz', 'gamma', 'proc', 'index', 'charge']
+        self.quantities= ['x','y','z','px','py','pz', 'gamma', 'proc', 'index', 'charge', 'KE']
         # YOU WRITE AS IF LaTeX BUT YOU MUST DOUBLE ESCAPE '\' CHARACTER
         self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
                            '\\gamma_i\\beta_{i,x}', '\\gamma_i\\beta_{i,y}', '\\gamma_i\\beta_{i,z}',
-                           '\\gamma_i', '\\mathrm{proc_i}','\\mathrm{ind_i}', '\\q_i']
+                           '\\gamma_i', '\\mathrm{proc_i}','\\mathrm{ind_i}', '\\q_i', '\\mathrm{KE}_i \\ [m_i c^2]']
+
+        self.oneDlabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
+                           '\\gamma\\beta_{x}', '\\gamma\\beta_{y}', '\\gamma\\beta_{z}',
+                           '\\gamma', '\\mathrm{proc}','\\mathrm{ind}', '\\q', '\\mathrm{KE} \\ [m_i c^2]']
+
         self.histLabel = 'f_i (p)'
     @cached_property
     def x(self):
@@ -85,6 +90,13 @@ class Ions(Particles):
         return np.sqrt(self.px**2+self.py**2+self.pz**2+1)
 
     @cached_property
+    def KE(self):
+        # an example of a calculated quantity could use
+        #return self.load_saved_quantities('proce')
+        return (self.gamma-1)
+
+
+    @cached_property
     def proc(self):
         return self.load_saved_quantities('proci')
 
@@ -96,11 +108,15 @@ class Electrons(Particles):
     '''The electron subclass'''
     def __init__(self, sim, name='electrons'):
         Particles.__init__(self, sim, name)
-        self.quantities = ['x','y','z','px','py','pz', 'gamma', 'proc', 'index', 'charge']
+        self.quantities = ['x','y','z','px','py','pz', 'gamma', 'proc', 'index', 'charge', 'KE']
         # YOU WRITE AS IF LaTeX BUT YOU MUST DOUBLE ESCAPE '\'  CHARACTER
         self.axislabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
                            '\\gamma_e\\beta_{x,e}', '\\gamma_e\\beta_{y,e}', '\\gamma_e\\beta_{z,e}',
-                           '\\gamma_e', '\\mathrm{proc_e}','\\mathrm{ind_e}', '\\q_e']
+                           '\\gamma_e', '\\mathrm{proc_e}','\\mathrm{ind_e}', '\\q_e', '\\mathrm{KE}_e \\ [m_i c^2]']
+        self.oneDlabels = ['x\\ [c/\\omega_{pe}]', 'y\\ [c/\\omega_{pe}]', 'z \\ [c/\\omega_{pe}]',
+                           '\\gamma\\beta_{x}', '\\gamma\\beta_{y}', '\\gamma\\beta_{z}',
+                           '\\gamma', '\\mathrm{proc}','\\mathrm{ind}', '\\q', '\\mathrm{KE} \\ [m_i c^2]']
+
         self.histLabel = 'f_e (p)'
     @cached_property
     def x(self):
@@ -135,6 +151,12 @@ class Electrons(Particles):
         # an example of a calculated quantity could use
         #return self.load_saved_quantities('proce')
         return np.sqrt(self.px**2+self.py**2+self.pz**2+1)
+
+    @cached_property
+    def KE(self):
+        # an example of a calculated quantity could use
+        #return self.load_saved_quantities('proce')
+        return (self.gamma-1)*self.sim.me/self.sim.mi
 
     @cached_property
     def proc(self):
@@ -201,6 +223,7 @@ class TristanSim(object):
         for prtl in Particles.get_prtls():
             prtl_obj['prtls'][prtl]= {'quantities': getattr(getattr(self,prtl),'quantities'),
                              'axisLabels': getattr(getattr(self,prtl),'axislabels'),
+                             'oneDLabels': getattr(getattr(self,prtl),'oneDlabels'),
                              'histLabel': getattr(getattr(self,prtl),'histLabel')}
         return prtl_obj
     def load_param(self, key):

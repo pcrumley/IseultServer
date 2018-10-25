@@ -97,7 +97,8 @@ def mom1d():
     #return jsonify(query_dict)
     abort(404)
 @app.route('/api/2dhist/imgs/')
-@crossdomain(origin='http://localhost:8080')
+#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='*')
 def hist2d_image():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'yval', 'xval', 'weights',
@@ -198,4 +199,4 @@ def open_simulation():
 
 if __name__=='__main__':
     #app.run(ssl_context='adhoc', port=5000, debug=True)
-    app.run(port=5000, debug=True)
+    app.run(port=5080, debug=True)

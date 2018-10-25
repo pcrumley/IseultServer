@@ -164,8 +164,8 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
         'vmax': np.max(hist)
         }
 
-def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
-                    yval='', xval='', weights = '', boolstr = '', ybins = '200',
+def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ions',
+                    yval='px', xval='x', weights = '', boolstr = '', ybins = '200',
                     xbins ='200', yvalmin='', yvalmax='', xvalmin = '',
                     xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'log',
                     pow_zero = '0', pow_gamma='1.0', vmin = '', clip = 'true',
@@ -177,9 +177,9 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     ### first we open up a tristan sim
     if sim_type =='tristan-mp':
         cur_sim = TristanSim(outdir, n = int(n), xtra_stride = int(xtra_stride))
-
     # first we evaluate the boolean string to see what values we should discard:
-    bool_arr = parse_boolstr(boolstr, cur_sim, prtl_type)
+    if len(boolstr)>0:
+        bool_arr = parse_boolstr(boolstr, cur_sim, prtl_type)
     # Now we go through an fill out some of the unfilled data needed to make
     # a histogram
     if bool_arr is None:

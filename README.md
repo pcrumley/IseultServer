@@ -1,10 +1,11 @@
 # IseultServer
-A flask-based server to accessing particle-in-cell data.
+A zeroMQ messaging server for sending your simulation data.
 
-This is a flask server that is a work-in-progress.
-The long-term goal is to provide a RESTful api to access simulation data over the internet. 
-Current design plans are that it will likely never be secure enough to allow arbitrary access 
-to the various clusters where your data may be saved.
+I am working on making a RESTful api to access simulation data over the internet. Initial plans were to send the data via an XHTML request, but it is difficult to send it from a locally hosted server to a real webpage. I am switching the webpage to an electron-app and have moved IseultServer from Flask to zeroMQ. I am leaving the flask server here but I am not planning on maintaining it. 
+
+Design plan is like this:
+
+IseultServer python kernel <-- JSON/ZeroMQ --> electron node.js <-- electron.IPC --> electron renderer.
 
 You must locally host the server on at each place where you have simulation data you would like to 
 access. The server should be only locally hosted with port-forwarding to access from your computer. 
@@ -14,12 +15,12 @@ to simulation data.
 To run the server on tigressdata type
 ```bash
 $ module load anaconda3 
-$ python server.py
+$ python zMQ_server.py
 ```
-This will start a flask server in debug mode on tigressdata port:5000. To access the server from your
+This will start a python instance that opens a socket on port:5555. To access the server from your
 local machine, you must use port forwarding. e.g.
 ```bash
-$  ssh -N -f -L localhost:5001:localhost:5000 <USER>@tigressdata.princeton.edu
+$  ssh -N -f -L localhost:5001:localhost:5555 pcrumley@tigressdata2.princeton.edu
 ```
 The above code makes it so you can access the IseultServer at localhost:5001.
 
@@ -27,7 +28,7 @@ The python code that provides the RESTful api is located in the ./src/ directory
 You can easily make new APIs for different simulations using ./src/tristan_sim.py as a starting point.
 
 The data will eventually be visualized with Iseult.js&mdash;a javascript front-end for the server located 
-here: http://github.com/pcrumley/Iseultjs The directory is private for now, but I plan on hosting it online 
+here: http://github.com/pcrumley/IseultJS The directory is private for now, but I plan on hosting it online 
 when it is further along.
 
 Right now, it's not very useful as it is still in heavy development, but you can play around by manually 

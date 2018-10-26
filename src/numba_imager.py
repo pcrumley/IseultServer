@@ -58,7 +58,7 @@ class myNumbaImage(object):
             self.zero = zero
 
     def resizeImage(self, py, px):
-        self.img = np.empy((py,px,4), dtype = 'uint8')
+        self.img = np.empty((py,px,4), dtype = 'uint8')
 
     def set_xlim(self, xmin = None, xmax=None):
         if xmin != None:

@@ -1,13 +1,13 @@
 # IseultServer
 A zeroMQ messaging server for sending your simulation data.
 
-I am working on making a RESTful api to access simulation data over the internet. Initial plans were to send the data via an XHTML request, but it is difficult to send it from a locally hosted server to a real webpage. I am switching the webpage to an electron-app and have moved IseultServer from Flask to zeroMQ. I am leaving the flask server here but I am not planning on maintaining it. 
+I am working on making a RESTful api to access simulation data over the internet. Initial plans were to send the data via an XHTML request, but it is difficult to send it from a locally hosted server to a real webpage. I am switching the webpage to an electron-app and have moved IseultServer from Flask to zeroMQ. You should be able to find the flask server here on an ealier commit. I am not planning on maintaining the Flask part of the app. 
 
 Design plan is like this:
 
-IseultServer python kernel <-- JSON/ZeroMQ --> electron node.js <-- electron.IPC --> electron renderer.
+IseultServer  <-- JSON/ZeroMQ --> electron node.js <-- electron.IPC --> electron renderer.
 
-You must locally host the server on at each place where you have simulation data you would like to 
+You must locally host the python kernel on at each place where you have simulation data you would like to 
 access. The server should be only locally hosted with port-forwarding to access from your computer. 
 To start the server, clone the git directory to a folder in a location where you have read access 
 to simulation data.

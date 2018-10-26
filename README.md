@@ -84,12 +84,10 @@ Make rendering images more efficient by not rendering full image then resizing a
 | Dependencies: |
 | ------------ |
 | Python 3.6&mdash;http://python.org |
-| Flask&mdash;http://flask.pocoo.org/ |
+| pyZMQ&mdash;https://github.com/zeromq/pyzmq/ |
 | NumPy&mdash;http://numpy.org |
 | Numba&mdash;http://numba.pydata.org/ |
 | Pillow&mdash;http://pillow.readthedocs.io/en/3.1.x/installation.html |
 | h5py&mdash;http://h5py.org |
 
 These things are in the default anaconda package. If the installation becomes more complicated I will detail it here.
-
-

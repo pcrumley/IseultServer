@@ -83,6 +83,7 @@ Make rendering images more efficient by not rendering full image then resizing a
 
 | Dependencies: |
 | ------------ |
+| Matplotlib &mdash; (just for colormaps) |
 | Python 3.6&mdash;http://python.org |
 | pyZMQ&mdash;https://github.com/zeromq/pyzmq/ |
 | NumPy&mdash;http://numpy.org |

@@ -5,6 +5,7 @@ from hist_helpers import stepify, eval_clause, parse_boolstr
 from numba_imager import myNumbaImage
 from point_in_polygon import point_in_polygon
 import numpy as np
+import matplotlib.pyplot as plt
 
 @jit(nopython=True)#
 def FastHist(x1, min1, max1, bnum1):
@@ -168,9 +169,9 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ion
                     yval='px', xval='x', weights = '', boolstr = '', ybins = '200',
                     xbins ='200', yvalmin='', yvalmax='', xvalmin = '',
                     xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'log',
-                    pow_zero = '0', pow_gamma='1.0', vmin = '', clip = 'true',
+                    pow_zero = '0', pow_gamma='1.0', vmin = '', clip = True,
                     vmax = '', xmin='', xmax ='', ymin='', ymax='', interpolation = 'bicubic',
-                    px ='400', py='400', aspect='auto', mask_zeros='true', xtra_stride = '1',
+                    px ='400', py='400', aspect='auto', mask_zeros=True, xtra_stride = '1',
                     selPolyXval= '', selPolyYval='', selPolyXarr='', selPolyYarr=''):
     '''First we calculate the histogram, then we turn it into an image and return
     the image as a bytesIO'''
@@ -178,8 +179,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ion
     if sim_type =='tristan-mp':
         cur_sim = TristanSim(outdir, n = int(n), xtra_stride = int(xtra_stride))
     # first we evaluate the boolean string to see what values we should discard:
-    if len(boolstr)>0:
-        bool_arr = parse_boolstr(boolstr, cur_sim, prtl_type)
+    bool_arr = parse_boolstr(boolstr, cur_sim, prtl_type)
     # Now we go through an fill out some of the unfilled data needed to make
     # a histogram
     if bool_arr is None:
@@ -197,7 +197,6 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ion
             warr = getattr(getattr(cur_sim, prtl_type), weights)[bool_arr]
         else:
             warr = np.array([])
-
     # NOW WE APPLY THE POLYGON:
     if (len(selPolyXval) != 0):
         inside = np.zeros(len(xarr), dtype='bool')
@@ -215,11 +214,10 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ion
         if (len(warr) != 0):
             warr = warr[inside]
 
-    yvalmin = yarr.min() if len(yvalmin)==0 else float(yvalmin)
-    yvalmax = yarr.max() if len(yvalmax)==0 else float(yvalmax)
-    xvalmin = xarr.min() if len(xvalmin)==0 else float(xvalmin)
-    xvalmax = xarr.max() if len(xvalmax)==0 else float(xvalmax)
-
+    yvalmin = yarr.min() if yvalmin == '' else float(yvalmin)
+    yvalmax = yarr.max() if yvalmax == '' else float(yvalmax)
+    xvalmin = xarr.min() if xvalmin == '' else float(xvalmin)
+    xvalmax = xarr.max() if xvalmax == '' else float(xvalmax)
     if len(warr)==0:
         hist = Fast2DHist(yarr, xarr, yvalmin, yvalmax, int(float(ybins)), xvalmin, xvalmax, int(float(xbins)))
     else:
@@ -231,26 +229,27 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ion
     # Now we have the histogram, we need to turn it into an image
     #
     ###
-    if normhist == 'true' and hist.max() != 0:
+    if normhist == True and hist.max() != 0:
         hist *= hist.max()**-1
-    if mask_zeros =='true':
+    if mask_zeros == True:
         hist[hist==0] = np.nan
+
     hist_img = myNumbaImage(int(py), int(px))
     hist_img.setInterpolation(interpolation)
     hist_img.setData(hist)
     hist_img.setExtent([xvalmin,xvalmax,yvalmin, yvalmax])
-    hist_img.set_xlim(xmin = None if len(xmin)==0 else float(xmin),
-                      xmax = None if len(xmax)==0 else float(xmax))
-    hist_img.set_ylim(ymin = None if len(ymin)==0 else float(ymin),
-                      ymax = None if len(ymax)==0 else float(ymax))
+    hist_img.set_xlim(xmin = None if xmin == '' else float(xmin),
+                      xmax = None if xmax == '' else float(xmax))
+    hist_img.set_ylim(ymin = None if ymin == '' else float(ymin),
+                      ymax = None if ymax == '' else float(ymax))
     if cnorm =='log':
-        hist_img.setNorm('log', clipped = True if clip =='true' else False)
+        hist_img.setNorm('log', clipped = True if clip == True else False)
     if cnorm =='linear':
-        hist_img.setNorm('linear', clipped = True if clip =='true' else False)
+        hist_img.setNorm('linear', clipped = True if clip == True else False)
     if cnorm =='pow':
         hist_img.setNorm('pow',zero = float(pow_zero), gamma = float(pow_gamma), clipped = True if clip =='true' else False)
     hist_img.setCmap(cmap)
-    hist_img.set_clim(cmin = None if len(vmin) ==0 else float(vmin), cmax = None if len(vmax)==0 else float(vmax))
+    hist_img.set_clim(cmin = None if vmin == '' else float(vmin), cmax = None if  vmax == '' else float(vmax))
     hist_img.set_aspect(0 if aspect=='auto' else 1)
     #hist_img.set_aspect(1)# if aspect=='auto' else 1)
     return hist_img.renderImageDict()

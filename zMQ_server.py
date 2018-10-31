@@ -45,6 +45,7 @@ while True:
             except KeyError:
                 pass
         responseDict = make_1d_hist(**query_dict)
+        responseDict['rType'] = 'Handshake'
         socket.send_json(responseDict)
 
     elif (msg['rType'] == 'mom1d'):
@@ -87,10 +88,12 @@ while True:
                 pass
 
         responseDict = make_2d_hist_img(**query_dict)
-        responseDict['i'] = int(request.args.get('i'))
-        responseDict['imgX'] = int(request.args.get('px'))
-        responseDict['imgY'] = int(request.args.get('py'))
-        responseDict['url'] = request.url
+        responseDict['rType'] = 'hist2d'
+        responseDict['i'] = int(msg['payload']['i'])
+        responseDict['imgX'] = int(msg['payload']['px'])
+        responseDict['imgY'] = int(msg['payload']['py'])
+        responseDict['url'] = msg['payload']['url']
+        print(responseDict)
         socket.send_json(responseDict)
 
     elif (msg['rType'] == 'mom2d'):
@@ -117,12 +120,13 @@ while True:
     elif (msg['rType'] == 'dirs'):
         BASE_DIR = '/'
         try:
-            req_path = msg['payload']['path']
+            req_path = msg['path']
 
         except KeyError:
             req_path = ''
             # Joining the base and the requested path
         abs_path = os.path.abspath(os.path.join(BASE_DIR, req_path))
+        print(abs_path)
         dirList = []
         fileList = []
         with os.scandir(abs_path) as it:
@@ -132,7 +136,11 @@ while True:
                         dirList.append(entry.name)
                     elif entry.is_file():
                         fileList.append(entry.name)
-        socket.send_json({'parentDir': os.path.split(abs_path)[0], 'dirs': dirList, 'files': fileList})
+        socket.send_json({
+            'rType': 'dirs',
+            'parentDir': os.path.split(abs_path)[0],
+            'dirs': dirList,
+            'files': fileList})
 
     elif (msg['rType'] == 'colorbar'):
         query_dict = {}
@@ -144,7 +152,9 @@ while True:
                 pass
 
         responseDict = make_color_bar(**query_dict)
-        responseDict['url'] = request.url
+        responseDict['url'] = msg['payload']['url']
+        responseDict['rType'] = 'colorbar'
+        print(responseDict)
         socket.send_json(responseDict)
 
     elif (msg['rType'] == 'openSim'):
@@ -155,7 +165,9 @@ while True:
                 query_dict[key] = msg['payload'][key]
             except KeyError:
                 pass
-        socket.send_json(open_sim(**query_dict))
+        responseDict = open_sim(**query_dict)
+        responseDict['rType'] = 'openSim'
+        socket.send_json(responseDict)
     else:
         #  Send reply back to client
         socket.send(b"World")

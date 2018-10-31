@@ -25,7 +25,7 @@ class myNumbaImage(object):
         self.gamma = 1.0
         self.clipped = True
         self.data = None
-        self.interpolation = 'bicubic'
+        self.interpolation = Image.BICUBIC
         self.griddedData = np.empty((py, px))
 
     def setData(self, X):
@@ -134,7 +134,6 @@ class myNumbaImage(object):
             powerNormImg(self.data[::-1,:],cminNormed, powNormColorBin, self.zero, self.gamma,self.clipped, myCmaps[self.cmap], self.imgData)
         if self.norm == 'log':
             logNorm(self.data[::-1,:],cmin,logNormBin(cmin, cmax, myCmaps[self.cmap].shape[0]), self.clipped, myCmaps[self.cmap], self.imgData)
-
         # We need to calculate the a,b,c,d,e,f matrix coefficients for the affine transformation in PIL
         a = (xmax-xmin)/(self.extent[1]-self.extent[0])*self.imgData.shape[1]/self.px
         b = 0
@@ -144,7 +143,6 @@ class myNumbaImage(object):
         f = (self.extent[3]-ymax)/(self.extent[3]-self.extent[2])*self.imgData.shape[0] #I'm not 100% sure why this works...
         self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f),
                                    resample=self.interpolation)
-
         img_io = io.BytesIO()
         self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
         img_io.seek(0)
@@ -318,17 +316,15 @@ if __name__ == "__main__":
         with h5py.File(sys.argv[1], 'r') as f:
             Bz = np.array(f['bz'][0,:,:],dtype = 'f8')
     except:
-        with h5py.File('output/flds.tot.003', 'r') as f:
+        with h5py.File('../test_output/flds.tot.003', 'r') as f:
             Bz1 = np.array(f['bz'][0,:,:],dtype = 'f8')
-        with h5py.File('output/flds.tot.002', 'r') as f:
-            Bz2 = np.array(f['bz'][0,:,:],dtype = 'f8')
 
     #for i in range(3):
     #    Bz = np.append(Bz,Bz, axis = 0)
     #Bz = np.copy(Bz[0:50,0:50])
     #print(Bz.shape)
 
-    im1 = myFieldImage(1000, 1000)
+    im1 = myNumbaImage(1000, 1000)
 
     im1.setData(Bz1)
 
@@ -340,13 +336,15 @@ if __name__ == "__main__":
     #BzList = [Bz1, Bz2]
 
     im1.setNorm('pow', zero = 0.0, gamma = 1.0)
-    im1.setNorm('linear')#, zero = 0.0, gamma = 1.0)
+    im1.setNorm('log')#, zero = 0.0, gamma = 1.0)
     im1.setCmap('viridis')
-    im1.renderImage()
+    im1.set_aspect(False)
+    im1.renderImageDict()
     def render_png(imgdata):
         #make a pil images
         img = Image.fromarray(imgdata)
         img_io = io.BytesIO()
         img.save(img_io, format='png',compress_level = 0)#, quality=100)
         #img_io.seek(0)
-    render_png(im1.img)
+    im1.img.show()
+    #render_png(im1.img)

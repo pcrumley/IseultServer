@@ -9,8 +9,10 @@ import zmq
 import json
 
 context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind("tcp://*:5555")
+worker = context.socket(zmq.PULL)
+worker.bind("tcp://*:5555")
+pusher = context.socket(zmq.PUSH)
+pusher.bind("tcp://*:5556")
 import sys, os
 sys.path.insert(0, './src/')
 from particle_hist import make_2d_hist_img, make_1d_hist
@@ -22,18 +24,27 @@ from functools import update_wrapper
 
 while True:
     #  Wait for next request from client
-    msg = socket.recv_json()
+    msg = worker.recv_json()
     #mJSON = json.loads(msg)
 
     print(msg)
     #for key in mJSON.keys():
     #   print(key)
     print("Received request: %s" % msg['rType'])
+
     if (msg['rType'] == 'Handshake'):
-        socket.send_json({'name':'IseultServer',
-                        'version': 'alpha',
-                        'sim_types': ['tristan-mp'],
-                        'server_dir': os.path.split(os.path.abspath(os.curdir))[0]})
+        print(msg)
+        pusher.send_json({'rType': msg['rType'],
+            'payload': {
+                'progName':'IseultServer',
+                'version': 'alpha',
+                'id': msg['payload']['id'],
+                'name': msg['payload']['name'],
+                'url': msg['payload']['url'],
+                'simTypes': ['tristan-mp'],
+                'serverDir': os.path.split(os.path.abspath(os.curdir))[0]}
+            })
+
     elif (msg['rType'] == 'hist1d'):
         query_dict = {}
         for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'weights',
@@ -46,7 +57,7 @@ while True:
                 pass
         responseDict = make_1d_hist(**query_dict)
         responseDict['rType'] = 'Handshake'
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
 
     elif (msg['rType'] == 'mom1d'):
         query_dict = {}
@@ -59,7 +70,7 @@ while True:
             except KeyError:
                 pass
         responseDict = make_1d_moments(**query_dict)
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
 
     elif (msg['rType'] == 'mom1d'):
         query_dict = {}
@@ -72,7 +83,7 @@ while True:
             except KeyError:
                 pass
         responseDict = make_1d_moments(**query_dict)
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
 
     elif (msg['rType'] == 'hist2d'):
         query_dict = {}
@@ -94,7 +105,7 @@ while True:
         responseDict['imgY'] = int(msg['payload']['py'])
         responseDict['url'] = msg['payload']['url']
         print(responseDict)
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
 
     elif (msg['rType'] == 'mom2d'):
         query_dict = {}
@@ -115,7 +126,7 @@ while True:
         responseDict['imgX'] = int(request.args.get('px'))
         responseDict['imgY'] = int(request.args.get('py'))
         responseDict['url'] = request.url
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
 
     elif (msg['rType'] == 'dirs'):
         BASE_DIR = '/'
@@ -136,11 +147,14 @@ while True:
                         dirList.append(entry.name)
                     elif entry.is_file():
                         fileList.append(entry.name)
-        socket.send_json({
+        pusher.send_json({
             'rType': 'dirs',
-            'parentDir': os.path.split(abs_path)[0],
-            'dirs': dirList,
-            'files': fileList})
+            'payload': {
+                'parentDir': os.path.split(abs_path)[0],
+                'dirList': dirList,
+                'fileList': fileList
+                }
+            })
 
     elif (msg['rType'] == 'colorbar'):
         query_dict = {}
@@ -155,19 +169,22 @@ while True:
         responseDict['url'] = msg['payload']['url']
         responseDict['rType'] = 'colorbar'
         print(responseDict)
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
 
     elif (msg['rType'] == 'openSim'):
         query_dict = {}
-        responseDict = {}
-        for key in ['sim_type', 'outdir']:
+        responseDict = {'payload': {}}
+        for key in ['simType', 'outdir']:
             try:
-                query_dict[key] = msg['payload'][key]
+                query_dict[key] = msg['payload']['info'][key]
             except KeyError:
                 pass
-        responseDict = open_sim(**query_dict)
+        responseDict['payload']['data'] = open_sim(**query_dict)
+        responseDict['payload']['info'] = msg['payload']['info']
+        responseDict['payload']['i'] = len(responseDict['payload']['data']['fileArray']) - 1
+        responseDict['payload']['lassos'] = {}
         responseDict['rType'] = 'openSim'
-        socket.send_json(responseDict)
+        pusher.send_json(responseDict)
     else:
         #  Send reply back to client
-        socket.send(b"World")
+        pusher.send(b"World")

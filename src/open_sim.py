@@ -1,8 +1,8 @@
 from tristan_sim import TristanSim
 from myCmaps import myCmaps_names
 
-def open_sim(sim_type ='tristan-mp', outdir = ''):
-    if sim_type =='tristan-mp':
+def open_sim(simType ='tristan-mp', outdir = ''):
+    if simType =='tristan-mp':
         mySim = TristanSim(dirpath=outdir)
 
     responseDict = mySim.get_avail_prtls()

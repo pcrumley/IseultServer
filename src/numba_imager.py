@@ -108,8 +108,12 @@ class myNumbaImage(object):
         #try:
         # we want to render image that is px by py in size,
         # and corresponds to the data from xlim and ylim.
-        cmin = self.data[~np.isnan(self.data)].min() if self.clim[0] is None else self.clim[0]
-        cmax = self.data[~np.isnan(self.data)].max() if self.clim[1] is None else self.clim[1]
+        if self.norm =='log':
+            cmin = self.data[self.data>0].min() if self.clim[0] is None else self.clim[0]
+            cmax = self.data[self.data>0].max() if self.clim[1] is None else self.clim[1]
+        else:
+            cmin = self.data[~np.isnan(self.data)].min() if self.clim[0] is None else self.clim[0]
+            cmax = self.data[~np.isnan(self.data)].max() if self.clim[1] is None else self.clim[1]
         xmin = self.extent[0] if self.xlim[0] is None else self.xlim[0]
         xmax = self.extent[1] if self.xlim[1] is None else self.xlim[1]
         ymin = self.extent[2] if self.ylim[0] is None else self.ylim[0]
@@ -141,8 +145,11 @@ class myNumbaImage(object):
         d = 0
         e = (ymax-ymin)/(self.extent[3]-self.extent[2])*self.imgData.shape[0]/self.py
         f = (self.extent[3]-ymax)/(self.extent[3]-self.extent[2])*self.imgData.shape[0] #I'm not 100% sure why this works...
+        print(self.data.min())
+        print(self.data.max())
         self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f),
                                    resample=self.interpolation)
+        self.img.save('tmp.png', format='png',compress_level = 1)#, quality=100)
         img_io = io.BytesIO()
         self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
         img_io.seek(0)

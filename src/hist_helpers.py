@@ -1,19 +1,10 @@
 from numba import jit
 from numpy import ones
-@jit(nopython=True, cache = True)
-def stepify(bins, hist):
-    # make it a step, there probably is a much better way to do this
-    tmp_hist = ones(2*len(hist))
-    tmp_bin = ones(2*len(hist))
-    for j in range(len(hist)):
-        tmp_hist[2*j] = hist[j]
-        tmp_hist[2*j+1] = hist[j]
+import numpy as np
 
-        tmp_bin[2*j] = bins[j]
-        if j != 0:
-            tmp_bin[2*j-1] = bins[j]
-        if j == len(hist)-1:
-            tmp_bin[2*j+1] = bins[j+1]
+def stepify(bins, hist):
+    tmp_bin = np.dstack((bins, bins)).flatten() 
+    tmp_hist = np.concatenate((np.array([0]),np.dstack((hist, hist)).flatten(), np.array([0])))
     return tmp_bin, tmp_hist
 
 def eval_clause(clause, sim, prtl_type):

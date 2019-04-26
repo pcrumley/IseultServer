@@ -178,6 +178,7 @@ def make_1d_moments(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
         bins = np.linspace(xvalmin, xvalmax, num = int(xbins)+1)
 
     x_arr, y_arr = stepify(bins, hist)
+    x_arr = x_arr[1:-1]; y_arr = y_arr[1:-1]
     mom1D = [{'y': y_arr[i],
            'x': x_arr[i]} for i in range(len(x_arr))]
     return {

@@ -10,7 +10,7 @@ from functools import update_wrapper
 import requests
 
 app = Flask(__name__)
-"""
+#"""
 def crossdomain(origin=None, methods=None, headers=None, max_age=21600, attach_to_all=True, automatic_options=True):
     if methods is not None:
         methods = ', '.join(sorted(x.upper() for x in methods))
@@ -49,10 +49,10 @@ def crossdomain(origin=None, methods=None, headers=None, max_age=21600, attach_t
         f.provide_automatic_options = False
         return update_wrapper(wrapped_function, f)
     return decorator
-"""
+#"""
 
 @app.route('/api/handshake')
-#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='http://localhost:8080')
 #@crossdomain(origin='*')
 def handshake():
     return jsonify({'name':'IseultServer',
@@ -61,7 +61,7 @@ def handshake():
                     'server_dir': os.path.split(os.path.abspath(os.curdir))[0]})
 
 @app.route('/api/1dhist/')
-#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='http://localhost:8080')
 def hist1d():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'weights',
@@ -82,7 +82,7 @@ def hist1d():
 
 
 @app.route('/api/1dmoments/')
-#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='http://localhost:8080')
 def mom1d():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'xval', 'yval', 'weights',
@@ -101,7 +101,7 @@ def mom1d():
     abort(404)
 @app.route('/api/2dhist/imgs/')
 #@crossdomain(origin='http://localhost:8080')
-#@crossdomain(origin='*')
+@crossdomain(origin='*')
 def hist2d_image():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'yval', 'xval', 'weights',
@@ -124,7 +124,7 @@ def hist2d_image():
     abort(404)
 
 @app.route('/api/2dmom/imgs/')
-#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='http://localhost:8080')
 def mom2d_image():
     query_dict = {}
     for key in ['outdir','sim_type','n', 'prtl_type', 'yval', 'xval', 'mval',
@@ -148,7 +148,7 @@ def mom2d_image():
     abort(404)
 @app.route('/dirs/', defaults={'req_path': ''})
 @app.route('/dirs/<path:req_path>')
-#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='http://localhost:8080')
 def dir_listing(req_path):
     BASE_DIR = '/'
     print(req_path)
@@ -174,7 +174,7 @@ def dir_listing(req_path):
     return jsonify({'parentDir': os.path.split(abs_path)[0], 'dirs': dirList, 'files': fileList})
 
 @app.route('/api/colorbar/')
-#@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='http://localhost:8080')
 def colorbar_image():
     query_dict = {}
     for key in ['cmap', 'cnorm', 'pow_zero', 'pow_gamma', 'vmin', 'vmax', 'clip',
@@ -188,6 +188,7 @@ def colorbar_image():
 
 
 @app.route('/api/openSim/')
+@crossdomain(origin='http://localhost:8080')
 def open_simulation():
     query_dict = {}
     responseDict = {}

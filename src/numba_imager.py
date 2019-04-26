@@ -149,7 +149,7 @@ class myNumbaImage(object):
         print(self.data.max())
         self.img = Image.frombytes('RGBA', self.data.shape[::-1],self.imgData).transform((self.px,self.py), Image.AFFINE, (a,b,c,d,e,f),
                                    resample=self.interpolation)
-        self.img.save('tmp.png', format='png',compress_level = 1)#, quality=100)
+        #self.img.save('tmp.png', format='png',compress_level = 1)#, quality=100)
         img_io = io.BytesIO()
         self.img.save(img_io, format='png',compress_level = 1)#, quality=100)
         img_io.seek(0)

@@ -174,7 +174,7 @@ def dir_listing(req_path):
     return jsonify({'parentDir': os.path.split(abs_path)[0], 'dirs': dirList, 'files': fileList})
 
 @app.route('/api/colorbar/')
-@crossdomain(origin='http://localhost:8080')
+@crossdomain(origin='*')
 def colorbar_image():
     query_dict = {}
     for key in ['cmap', 'cnorm', 'pow_zero', 'pow_gamma', 'vmin', 'vmax', 'clip',

@@ -33,7 +33,7 @@ def FastWeightedHist(x1, weights, min1, max1, bnum1):
                 else:
                     j = (x1[i]-min1)*b1_w
                 if j<bnum1:
-                    hist[int(j)] += weights[j]
+                    hist[int(j)] += weights[i]
     return hist
 
 @jit(nopython=True)#
@@ -146,10 +146,12 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
     ###
 
     if xscale =='log' and xvalmin >0:
-        bin_width = (np.log10(xvalmax)-np.log10(xvalmin))/int(xbins)
-        hist1D = [{'num': hist[i],
-                   'x0': 10**(np.log10(xvalmin)+bin_width*i),
-                   'x1': 10**(np.log10(xvalmin)+bin_width*(i+1))} for i in range(len(hist))]
+        bin_width = (xvalmax-xvalmin)/int(xbins)
+        bins = np.logspace(np.log10(xvalmin), np.log10(xvalmax), num = int(xbins)+1)
+        x_arr, y_arr = stepify(bins, hist)
+        hist1D = [{'y': y_arr[i],
+                   'x': x_arr[i]} for i in range(len(x_arr))]
+
     else:
         bin_width = (xvalmax-xvalmin)/int(xbins)
         bins = np.linspace(xvalmin, xvalmax, num = int(xbins)+1)
@@ -168,7 +170,7 @@ def make_1d_hist(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='',
 def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ions',
                     yval='px', xval='x', weights = '', boolstr = '', ybins = '200',
                     xbins ='200', yvalmin='', yvalmax='', xvalmin = '',
-                    xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'log',
+                    xvalmax = '', normhist = 'true',cmap='viridis', cnorm = 'linear',
                     pow_zero = '0', pow_gamma='1.0', vmin = '', clip = True,
                     vmax = '', xmin='', xmax ='', ymin='', ymax='', interpolation = 'bicubic',
                     px ='400', py='400', aspect='auto', mask_zeros=True, xtra_stride = '1',
@@ -232,6 +234,7 @@ def make_2d_hist_img(outdir = '', sim_type = 'tristan-mp', n='1', prtl_type='ion
     if normhist == True and hist.max() != 0:
         hist *= hist.max()**-1
     if mask_zeros == True:
+        print('masked')
         hist[hist==0] = np.nan
 
     hist_img = myNumbaImage(int(py), int(px))

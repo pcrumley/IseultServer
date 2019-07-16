@@ -15,7 +15,7 @@ from open_sim import open_sim
 #from gen_png import hdf2png
 #from cache import FileCache
 
-my_port = 5050
+my_port = 50502
 if len(sys.argv) > 1:
     my_port = sys.argv[1]
 
@@ -60,8 +60,8 @@ class Hist1dHandler(web.RequestHandler):
         query_dict = {}
 
         default_dict = {"outdir":None, "sim_type": 'tristan-mp', "n":'1', "prtl_type":None,
-                         "xval":None, "weights": '', "boolstr": '', "xbins":'200', "ybins":'200', "xvalmin": '',
-                         "xvalmax": '', "yvalmin": '', "yvalmax": '', "xtra_stride": '1', "xscale": 'linear',
+                         "xval":None, "weights": '', "boolstr": '', "xbins":'200',  "xvalmin": '',
+                         "xvalmax": '', "xtra_stride": '1', "xscale": 'linear',
                         "selPolyXval": '', "selPolyYval": '', "selPolyXarr": '', "selPolyYarr":''}
 
         for key, val  in default_dict.items():
@@ -115,15 +115,20 @@ class Mom2dHandler(web.RequestHandler):
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
     def get(self):
         query_dict = {}
+
         default_dict = { "outdir":None, "sim_type": 'tristan-mp', "n":'1', "prtl_type":'ions',
-                 "xval":'x', "yval":'y', "mval":'px', "weights": '', "boolstr": '', "normhist": 'true', "xbins":'200', "ybins":'200',"xvalmin": '',
-                 "xvalmax": '', "xtra_stride": '1',
+                 "xval":'x', "yval":'y', "mval":'px', "weights": '', "boolstr": '', "xbins":'200', "ybins":'200',"xvalmin": '',
+                 "xvalmax": '',"yvalmin": '',
+                 "yvalmax": '', "xtra_stride": '1',
                  "cmap":'viridis', "cnorm":'linear',
                  "pow_zero":'0', "pow_gamma":'1.0', "vmin":'', "clip":True,
                  "vmax":'', "xmin":'', "xmax":'', "ymin":'', "ymax":'', "interpolation":'bicubic',
                  "px":'400', "py":'400', "aspect":'auto', "mask_zeros":True,
                 "selPolyXval": '', "selPolyYval": '', "selPolyXarr": '', "selPolyYarr":''}
+
+
         for key, val  in default_dict.items():
+
             query_dict[key] = self.get_query_argument(key, val)
         responseDict = make_2d_mom_img(**query_dict)
         responseDict['i'] = int(self.get_query_argument('i'))
@@ -234,6 +239,7 @@ def make_app():
         (r"/api/1dhist/", Hist1dHandler),
         (r"/api/1dmoments/", Mom1dHandler),
         (r"/api/2dhist/", Hist2dHandler),
+        (r"/api/2dmom/", Mom2dHandler),
         (r"/api/dirs/", DirHandler),
         (r"/api/colorbar/", ColorbarHandler),
         (r"/api/openSim/", SimOpenHandler),

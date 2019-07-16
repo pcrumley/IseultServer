@@ -7,15 +7,15 @@ access. The server should be only locally hosted with port-forwarding to access 
 To start the server, clone the git directory to a folder in a location where you have read access 
 to simulation data.
 
-To run the server on tigressdata type
+To run the server on tigressdata, e.g.
 ```bash
 $ module load anaconda3 
-$ python app.py <PORT>
+$ python app.py 50111
 ```
-This will start a python instance that opens a socket on <port>: e.g. 127.0.0.1.50502. To access the server from your
+This will start a python instance that opens a socket on 127.0.0.1:5011. To access the server from your
 local machine, you must use port forwarding. e.g.
 ```bash
-$  ssh -N -f -L localhost:8080:localhost:50502 pcrumley@tigressdata2.princeton.edu
+$  ssh -N -f -L localhost:8080:localhost:50111 pcrumley@tigressdata2.princeton.edu
 ```
 The above code makes it so you can access the IseultServer interface by opening your browser and pointing to localhost:8080.
 

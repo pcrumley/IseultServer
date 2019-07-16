@@ -1,13 +1,8 @@
 # IseultServer
-A zeroMQ messaging server for sending your simulation data.
+A Tornado baseds server for sending your simulation data.
 
-I am working on making a RESTful api to access simulation data over the internet. Initial plans were to send the data via an XHTML request, but it is difficult to send it from a locally hosted server to a real webpage. I am switching the webpage to an electron-app and have moved IseultServer from Flask to zeroMQ. You should be able to find the flask server here on an ealier commit. I am not planning on maintaining the Flask part of the app. 
 
-Design plan is like this:
-
-IseultServer  <-- JSON/ZeroMQ --> electron node.js <-- electron.IPC --> electron renderer.
-
-You must locally host the python kernel on at each place where you have simulation data you would like to 
+You must locally host a python server on at each place where you have simulation data you would like to 
 access. The server should be only locally hosted with port-forwarding to access from your computer. 
 To start the server, clone the git directory to a folder in a location where you have read access 
 to simulation data.
@@ -15,14 +10,14 @@ to simulation data.
 To run the server on tigressdata type
 ```bash
 $ module load anaconda3 
-$ python zMQ_server.py
+$ python app.py <PORT>
 ```
-This will start a python instance that opens a socket on port:5555. To access the server from your
+This will start a python instance that opens a socket on <port>: e.g. 127.0.0.1.50502. To access the server from your
 local machine, you must use port forwarding. e.g.
 ```bash
-$  ssh -N -f -L localhost:5001:localhost:5555 pcrumley@tigressdata2.princeton.edu
+$  ssh -N -f -L localhost:8080:localhost:50502 pcrumley@tigressdata2.princeton.edu
 ```
-The above code makes it so you can access the IseultServer at localhost:5001.
+The above code makes it so you can access the IseultServer interface by opening your browser and pointing to localhost:8080.
 
 The python code that provides the RESTful api is located in the ./src/ directory. 
 You can easily make new APIs for different simulations using ./src/tristan_sim.py as a starting point.

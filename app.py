@@ -30,8 +30,11 @@ settings = {
 
 class ApiHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
+
     def get(self):
         fpath = self.get_argument('path', None)
         fname = self.get_argument('filename', None)
@@ -42,10 +45,12 @@ class ApiHandler(web.RequestHandler):
                         'server_dir': os.path.split(os.path.abspath(os.curdir))[0]}))
 
 class HandshakeHandler(web.RequestHandler):
-
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
+
     def get(self):
         self.write(json.dumps({'name':'IseultServer',
                         'version': 'alpha',
@@ -54,7 +59,9 @@ class HandshakeHandler(web.RequestHandler):
 
 class Hist1dHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
     def get(self):
         query_dict = {}
@@ -71,8 +78,11 @@ class Hist1dHandler(web.RequestHandler):
 
 class Hist2dHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
+
     def get(self):
         query_dict = {}
         default_dict = { "outdir":None, "sim_type": 'tristan-mp', "n":'1', "prtl_type":'ions',
@@ -96,8 +106,11 @@ class Hist2dHandler(web.RequestHandler):
 
 class Mom1dHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
+
     def get(self):
         query_dict = {}
         default_dict = {"outdir":None, "sim_type": 'tristan-mp', "n":'1', "prtl_type":None,
@@ -111,7 +124,9 @@ class Mom1dHandler(web.RequestHandler):
 
 class Mom2dHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
     def get(self):
         query_dict = {}
@@ -139,7 +154,9 @@ class Mom2dHandler(web.RequestHandler):
 
 class DirHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
     def get(self):
         print('hi!')
@@ -169,7 +186,9 @@ class DirHandler(web.RequestHandler):
 
 class ColorbarHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
     def get(self):
         query_dict = {}
@@ -188,7 +207,9 @@ class ColorbarHandler(web.RequestHandler):
 
 class SimOpenHandler(web.RequestHandler):
     def set_default_headers(self):
-        """Set the default response header to be JSON."""
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
     def get(self):
         query_dict = {}
